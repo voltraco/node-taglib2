@@ -132,14 +132,16 @@ NAN_METHOD(writeTagsSync) {
     const size_t blen = node::Buffer::Length(cover->ToObject());
     TagLib::ByteVector data(buffer, blen);
 
-    if (!data.find("JFIF")) {
-      Nan::ThrowTypeError("Image is empty or not a JPEG");
+    if (!hasOption("mimetype")) {
+      Nan::ThrowTypeError("cover needs a mimetype");
       return;
     }
 
+    auto mimetype = getOptionString("mimetype");
+
     TagLib::Picture pic(data,
       TagLib::Picture::FrontCover,
-      "image/jpeg",
+      mimetype.c_str(),
       "Added with node-taglib2");
 
     TagLib::PictureMap picMap(pic);

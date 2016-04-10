@@ -15,6 +15,7 @@ const props = {
   genre: 'blues',
   year: 1951,
   track: 3,
+  mimetype: 'image/jpg',
   cover: fs.readFileSync('./cover.jpg')
 }
 
@@ -29,7 +30,7 @@ const tags = taglib.readTagsSync('./file.mp3')
 ```
 
 #### OUTPUT
-tags.cover will be an array of buffers that contain image data.
+`tags.cover` will be an array of buffers that contain image data.
 
 ```json
 {

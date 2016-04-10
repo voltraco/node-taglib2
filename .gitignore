@@ -5,6 +5,7 @@ npn-debug.*
 *.sw.*
 
 /taglib
+/tests/tmp
 /build
 /node_modules
 

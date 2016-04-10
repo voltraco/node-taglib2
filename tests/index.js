@@ -42,6 +42,7 @@ test('sync write/read', assert => {
     genre: 'genre' + rn,
     year: rn_year,
     track: '3' + rn,
+    mimetype: 'image/jpeg',
     cover: imagefile 
   })
 
@@ -70,6 +71,75 @@ test('sync write/read', assert => {
   assert.equal(tags.channels, 2)
   assert.equal(tags.length, 90)
   assert.equal(tags.time, '1:30')
+
+  assert.equal(Buffer.compare(
+    fs.readFileSync(tmpImagepath),
+    fs.readFileSync(imagepath)
+  ), 0)
+
+  assert.end()
+})
+
+test('sync write/read m4a + jpg', assert => {
+
+  const rn = Math.floor(Math.random() * 100)
+  const rn_year = Math.floor(Math.random() * 1000)
+
+  const audiopath = FIXTURES_PATH + '/sample-output.m4a'
+  fs.writeFileSync(audiopath, fs.readFileSync(FIXTURES_PATH + '/sample.m4a'))
+
+  const imagepath = FIXTURES_PATH + '/sample.jpg'
+  const imagefile = fs.readFileSync(imagepath)
+
+  assert.comment('write a copy of an mp4 file with a new image')
+  const r = taglib2.writeTagsSync(audiopath, {
+    mimetype: 'image/jpeg',
+    cover: imagefile 
+  })  
+
+  assert.comment('read the tags from the new file')
+  const tags = taglib2.readTagsSync(audiopath)
+
+  assert.comment('write the picture to a tmp file')
+  const tmpImagepath = TMP_PATH + '/sample.jpg'
+  fs.writeFileSync(tmpImagepath, tags.pictures[0])
+
+  assert.comment('compare the image extracted to the image added')
+
+  assert.equal(Buffer.compare(
+    fs.readFileSync(tmpImagepath),
+    fs.readFileSync(imagepath)
+  ), 0)
+
+  assert.end()
+})
+
+
+test('sync write/read m4a + png', assert => {
+
+  const rn = Math.floor(Math.random() * 100)
+  const rn_year = Math.floor(Math.random() * 1000)
+
+  const audiopath = FIXTURES_PATH + '/sample-output-png.m4a'
+  fs.writeFileSync(audiopath, fs.readFileSync(FIXTURES_PATH + '/sample.m4a'))
+
+  const imagepath = FIXTURES_PATH + '/sample.png'
+  const imagefile = fs.readFileSync(imagepath)
+
+  assert.comment('write a copy of an mp4 file with a new image')
+  const r = taglib2.writeTagsSync(audiopath, {
+    mimetype: 'image/png',
+    cover: imagefile 
+  })
+
+  assert.comment('read the tags from the new file')
+  const tags = taglib2.readTagsSync(audiopath)
+
+  assert.comment('write the picture to a tmp file')
+  const tmpImagepath = TMP_PATH + '/sample.png'
+  fs.writeFileSync(tmpImagepath, tags.pictures[0])
+
+  assert.comment('compare the image extracted to the image added')
 
   assert.equal(Buffer.compare(
     fs.readFileSync(tmpImagepath),
