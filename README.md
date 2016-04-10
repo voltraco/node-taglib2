@@ -3,9 +3,12 @@ taglib version 2 bindings
 
 # USAGE
 ### WRITING TAGS
+A `cover`, can be any image type, but you need to specify the mimetype,
+to find the mimetype, we use [`node-mime`](https://github.com/broofa/node-mime).
 
 ```js
 const taglib = require('taglib2')
+const mime = require('node-mime')
 
 const props = {
   artist: 'Howlin\' Wolf',
@@ -15,7 +18,7 @@ const props = {
   genre: 'blues',
   year: 1951,
   track: 3,
-  mimetype: 'image/jpg',
+  mimetype: mime('./cover.jpg'),
   cover: fs.readFileSync('./cover.jpg')
 }
 
