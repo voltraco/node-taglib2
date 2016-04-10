@@ -84,10 +84,9 @@ NAN_METHOD(writeTagsSync) {
     return;
   }
 
-  if (info[1]->IsObject()) {
-    options = v8::Local<v8::Object>::Cast(info[1]);
-  }
+  if (!info[1]->IsObject()) return;
 
+  options = v8::Local<v8::Object>::Cast(info[1]);
   std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
 
   if (!isFile(audio_file.c_str())) {
@@ -102,8 +101,6 @@ NAN_METHOD(writeTagsSync) {
     Nan::ThrowTypeError("Could not parse file");
     return;
   }
-
-  std::string::size_type sz;
 
   auto hasOption = [&](const std::string name) -> bool {
     return options->Has(Nan::New(name).ToLocalChecked());
@@ -171,7 +168,7 @@ NAN_METHOD(readTagsSync) {
   TagLib::FileRef f(audio_file.c_str());
   TagLib::Tag *tag = f.tag();
 
-  if (!tag) {
+  if (!tag || f.isNull()) {
     Nan::ThrowTypeError("Could not parse file");
     return;
   }
@@ -203,12 +200,12 @@ NAN_METHOD(readTagsSync) {
     TagLibStringToString(tag->genre())
   );
 
-  obj->Set(
+  obj->Set( // is always at least 0
     Nan::New("track").ToLocalChecked(),
     Nan::New<v8::Integer>(tag->track())
   );
 
-  obj->Set(
+  obj->Set( // is always at least 0
     Nan::New("year").ToLocalChecked(),
     Nan::New<v8::Integer>(tag->year())
   );
@@ -232,6 +229,42 @@ NAN_METHOD(readTagsSync) {
     }
 
     obj->Set(Nan::New("pictures").ToLocalChecked(), pictures);
+  }
+
+  if(f.audioProperties()) {
+
+    TagLib::AudioProperties *properties = f.audioProperties();
+
+    int seconds = properties->length() % 60;
+    int minutes = (properties->length() - seconds) / 60;
+
+    obj->Set(
+      Nan::New("bitrate").ToLocalChecked(),
+      Nan::New<v8::Integer>(properties->bitrate())
+    );
+
+    obj->Set(
+      Nan::New("samplerate").ToLocalChecked(),
+      Nan::New<v8::Integer>(properties->sampleRate())
+    );
+
+    obj->Set(
+      Nan::New("channels").ToLocalChecked(),
+      Nan::New<v8::Integer>(properties->channels())
+    );
+
+    stringstream ss;
+    ss << minutes << ":" << setfill('0') << setw(2) << seconds;
+    string s = ss.str();
+
+    auto time = Nan::New<v8::String>(s.c_str(), s.size()).ToLocalChecked();
+
+    obj->Set(Nan::New("time").ToLocalChecked(), time);
+
+    obj->Set(
+      Nan::New("length").ToLocalChecked(),
+      Nan::New<v8::Integer>(properties->length())
+    );
   }
 
   info.GetReturnValue().Set(obj);

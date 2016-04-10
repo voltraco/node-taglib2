@@ -2,7 +2,7 @@
 taglib version 2 bindings
 
 # USAGE
-Writing tags
+### WRITING TAGS
 
 ```js
 const taglib = require('taglib2')
@@ -21,12 +21,15 @@ const props = {
 taglib.writeTagsSync('./file.mp3', props)
 ```
 
-Reading tags
+### READING TAGS
 
 ```js
 const taglib = require('taglib2')
-let tags = taglib.readTagsSync('./file.mp3')
+const tags = taglib.readTagsSync('./file.mp3')
 ```
+
+#### OUTPUT
+tags.cover will be an array of buffers that contain image data.
 
 ```json
 {
@@ -37,7 +40,12 @@ let tags = taglib.readTagsSync('./file.mp3')
   "genre": "blues",
   "year": 1951,
   "track": 3,
-  "cover": [<Buffer>]
+  "cover": [],
+  "bitrate": 192,
+  "samplerate": 44100,
+  "channels": 2,
+  "time": "1:30",
+  "length": 90
 }
 ```
 

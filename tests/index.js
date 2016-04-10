@@ -16,7 +16,7 @@ test('setup', assert => {
 
 rimraf.sync(TMP_PATH + '/*')
 
-test('sanity', assert => {
+test('sync write/read', assert => {
 
   const rn = Math.floor(Math.random() * 100)
   const rn_year = Math.floor(Math.random() * 1000)
@@ -29,6 +29,10 @@ test('sanity', assert => {
 
   assert.ok(!!fs.statSync(audiopath))
   assert.ok(!!fs.statSync(imagepath))
+
+  assert.throws(() => {
+    taglib2.writeTagsSync();
+  }, 'not enough arguments');
 
   const r = taglib2.writeTagsSync(audiopath, {
     artist: 'artist' + rn,
@@ -43,6 +47,11 @@ test('sanity', assert => {
 
   assert.ok(r)
 
+
+  assert.throws(() => {
+    taglib2.readTagsSync();
+  }, 'not enough arguments');
+
   const tags = taglib2.readTagsSync(audiopath)
 
   assert.equal(tags.artist, 'artist' + rn)
@@ -55,6 +64,12 @@ test('sanity', assert => {
 
   const tmpImagepath = TMP_PATH + '/sample.jpg'
   fs.writeFileSync(tmpImagepath, tags.pictures[0])
+
+  assert.equal(tags.bitrate, 192)
+  assert.equal(tags.samplerate, 44100)
+  assert.equal(tags.channels, 2)
+  assert.equal(tags.length, 90)
+  assert.equal(tags.time, '1:30')
 
   assert.equal(Buffer.compare(
     fs.readFileSync(tmpImagepath),
