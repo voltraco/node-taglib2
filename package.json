@@ -1,6 +1,6 @@
 {
   "name": "taglib2",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "taglib version2 bindings",
   "dependencies": {
     "cmake-js": "2",
