@@ -96,11 +96,14 @@ NAN_METHOD(writeTagsSync) {
 
   TagLib::FileRef f(audio_file.c_str());
   TagLib::Tag *tag = f.tag();
+  TagLib::PropertyMap map = f.properties();
 
   if (!tag) {
     Nan::ThrowTypeError("Could not parse file");
     return;
   }
+
+  bool hasProps = false;
 
   auto hasOption = [&](const std::string name) -> bool {
     return options->Has(Nan::New(name).ToLocalChecked());
@@ -116,6 +119,31 @@ NAN_METHOD(writeTagsSync) {
     return options->Get(Nan::New(name).ToLocalChecked())->Int32Value();
   };
 
+  if (hasOption("albumartist")) {
+    hasProps = true;
+    TagLib::String value = getOptionString("albumartist");
+    map.erase(TagLib::String("ALBUMARTIST"));
+    map.insert(TagLib::String("ALBUMARTIST"), value);
+  }
+
+  if (hasOption("disknumber")) {
+    hasProps = true;
+    TagLib::String value = getOptionString("disknumber");
+    map.erase(TagLib::String("DISKNUMBER"));
+    map.insert(TagLib::String("DISKNUMBER"), value);
+  }
+
+  if (hasOption("composer")) {
+    hasProps = true;
+    TagLib::String value = getOptionString("composer");
+    map.erase(TagLib::String("COMPOSER"));
+    map.insert(TagLib::String("COMPOSER"), value);
+  }
+
+  if (hasProps) {
+    f.setProperties(map);
+  }
+
   if (hasOption("artist")) tag->setArtist(getOptionString("artist"));
   if (hasOption("title")) tag->setTitle(getOptionString("title"));
   if (hasOption("album")) tag->setAlbum(getOptionString("album"));
@@ -124,28 +152,30 @@ NAN_METHOD(writeTagsSync) {
   if (hasOption("year")) tag->setYear(getOptionInt("year"));
   if (hasOption("track")) tag->setTrack(getOptionInt("track"));
 
-  auto cover = options->Get(Nan::New("cover").ToLocalChecked());
+  if (hasOption("cover")) {
+    auto cover = options->Get(Nan::New("cover").ToLocalChecked());
 
-  if (!cover.IsEmpty() && node::Buffer::HasInstance(cover->ToObject())) {
+    if (!cover.IsEmpty() && node::Buffer::HasInstance(cover->ToObject())) {
 
-    char* buffer = node::Buffer::Data(cover->ToObject());
-    const size_t blen = node::Buffer::Length(cover->ToObject());
-    TagLib::ByteVector data(buffer, blen);
+      char* buffer = node::Buffer::Data(cover->ToObject());
+      const size_t blen = node::Buffer::Length(cover->ToObject());
+      TagLib::ByteVector data(buffer, blen);
 
-    if (!hasOption("mimetype")) {
-      Nan::ThrowTypeError("cover needs a mimetype");
-      return;
+      if (!hasOption("mimetype")) {
+        Nan::ThrowTypeError("cover needs a mimetype");
+        return;
+      }
+
+      auto mimetype = getOptionString("mimetype");
+
+      TagLib::Picture pic(data,
+        TagLib::Picture::FrontCover,
+        mimetype.c_str(),
+        "Added with node-taglib2");
+
+      TagLib::PictureMap picMap(pic);
+      tag->setPictures(picMap);
     }
-
-    auto mimetype = getOptionString("mimetype");
-
-    TagLib::Picture pic(data,
-      TagLib::Picture::FrontCover,
-      mimetype.c_str(),
-      "Added with node-taglib2");
-
-    TagLib::PictureMap picMap(pic);
-    tag->setPictures(picMap);
   }
 
   f.save();
@@ -169,6 +199,7 @@ NAN_METHOD(readTagsSync) {
 
   TagLib::FileRef f(audio_file.c_str());
   TagLib::Tag *tag = f.tag();
+  TagLib::PropertyMap map = f.properties();
 
   if (!tag || f.isNull()) {
     Nan::ThrowTypeError("Could not parse file");
@@ -186,6 +217,38 @@ NAN_METHOD(readTagsSync) {
     Nan::New("artist").ToLocalChecked(),
     TagLibStringToString(tag->artist())
   );
+
+  if (map.contains("ALBUMARTIST")) {
+    obj->Set(
+      Nan::New("albumartist").ToLocalChecked(),
+      TagLibStringToString(map["ALBUMARTIST"].toString(","))
+    );
+  }
+
+  if (map.contains("DISKNUMBER")) {
+    obj->Set(
+      Nan::New("disknumber").ToLocalChecked(),
+      TagLibStringToString(map["DISKNUMBER"].toString(","))
+    );
+  }
+
+  if (map.contains("BPM")) {
+    TagLib::String sl = map["BPM"].toString("");
+    TagLib::ByteVector vec = sl.data(TagLib::String::Latin1);
+    char* s = vec.data();
+
+    obj->Set(
+      Nan::New("bpm").ToLocalChecked(),
+      Nan::New<v8::Integer>(atoi(s))
+    );
+  }
+
+  if (map.contains("COMPOSER")) {
+    obj->Set(
+      Nan::New("composer").ToLocalChecked(),
+      TagLibStringToString(map["COMPOSER"].toString(","))
+    );
+  }
 
   !tag->album().isEmpty() && obj->Set(
     Nan::New("album").ToLocalChecked(),

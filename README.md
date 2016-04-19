@@ -38,14 +38,17 @@ const tags = taglib.readTagsSync('./file.mp3')
 ```json
 {
   "artist": "Howlin' Wolf",
+  "albumartist": "Howlin' Wolf",
   "title": "Evil is goin' on",
   "album": "Smokestack Lightnin'",
   "comment": "Chess Master Series",
+  "composer": "Chester Burnett",
   "genre": "blues",
   "year": 1951,
   "track": 3,
   "cover": [],
   "bitrate": 192,
+  "bpm": 120,
   "samplerate": 44100,
   "channels": 2,
   "time": "1:30",

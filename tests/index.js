@@ -18,8 +18,15 @@ rimraf.sync(TMP_PATH + '/*')
 
 test('sync write/read', assert => {
 
+  function getRandomYear() {
+    const date = new Date
+    const from = date.setFullYear(1877, 0, 1)
+    const to = (new Date).getTime()
+    return new Date(from + Math.random() * (to - from)).getFullYear()
+  }
+
   const rn = Math.floor(Math.random() * 100)
-  const rn_year = Math.floor(Math.random() * 1000)
+  const rn_year = getRandomYear()
 
   const audiopath = FIXTURES_PATH + '/sample-output.mp3'
   fs.writeFileSync(audiopath, fs.readFileSync(FIXTURES_PATH + '/sample.mp3'))
@@ -31,37 +38,43 @@ test('sync write/read', assert => {
   assert.ok(!!fs.statSync(imagepath))
 
   assert.throws(() => {
-    taglib2.writeTagsSync();
-  }, 'not enough arguments');
+    taglib2.writeTagsSync()
+  }, 'not enough arguments')
 
   const r = taglib2.writeTagsSync(audiopath, {
     artist: 'artist' + rn,
+    albumartist: 'albumartist' + rn,
     title: 'title' + rn,
     album: 'album' + rn,
     comment: 'comment' + rn,
     genre: 'genre' + rn,
     year: rn_year,
-    track: '3' + rn,
+    track: 3 + rn,
+    disknumber: '1' + rn,
+    composer: 'composer' + rn,
     mimetype: 'image/jpeg',
     cover: imagefile 
   })
 
   assert.ok(r)
 
-
   assert.throws(() => {
-    taglib2.readTagsSync();
-  }, 'not enough arguments');
+    taglib2.readTagsSync()
+  }, 'not enough arguments')
 
   const tags = taglib2.readTagsSync(audiopath)
 
   assert.equal(tags.artist, 'artist' + rn)
+  assert.equal(tags.albumartist, 'albumartist' + rn)
   assert.equal(tags.title, 'title' + rn)
+  assert.equal(tags.bpm, 120)
   assert.equal(tags.album, 'album' + rn)
   assert.equal(tags.comment, 'comment' + rn)
   assert.equal(tags.genre, 'genre' + rn)
   assert.equal(tags.year, parseInt(rn_year), 10)
-  assert.equal(tags.track, parseInt('3' + rn), 10)
+  assert.equal(tags.disknumber, '1' + rn)
+  assert.equal(tags.composer, 'composer' + rn)
+  assert.equal(tags.track, 3 + rn)
 
   const tmpImagepath = TMP_PATH + '/sample.jpg'
   fs.writeFileSync(tmpImagepath, tags.pictures[0])
