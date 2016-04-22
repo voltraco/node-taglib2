@@ -71,6 +71,10 @@ Local<Value> TagLibStringToString(TagLib::String s) {
   ).ToLocalChecked();
 }
 
+TagLib::String StringToTagLibString(std::string s) {
+  return TagLib::String(s, TagLib::String::UTF8);
+}
+
 NAN_METHOD(writeTagsSync) {
   Local<v8::Object> options;
 
@@ -109,10 +113,10 @@ NAN_METHOD(writeTagsSync) {
     return options->Has(Nan::New(name).ToLocalChecked());
   };
 
-  auto getOptionString = [&](const std::string name) -> std::string {
+  auto getOptionString = [&](const std::string name) -> TagLib::String {
     auto r = options->Get(Nan::New(name).ToLocalChecked());
     std::string s = *v8::String::Utf8Value(r);
-    return s.c_str();
+    return StringToTagLibString(s);
   };
 
   auto getOptionInt = [&](const std::string name) -> int {
@@ -170,7 +174,7 @@ NAN_METHOD(writeTagsSync) {
 
       TagLib::Picture pic(data,
         TagLib::Picture::FrontCover,
-        mimetype.c_str(),
+        mimetype,
         "Added with node-taglib2");
 
       TagLib::PictureMap picMap(pic);

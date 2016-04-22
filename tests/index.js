@@ -42,7 +42,7 @@ test('sync write/read', assert => {
   }, 'not enough arguments')
 
   const r = taglib2.writeTagsSync(audiopath, {
-    artist: 'artist' + rn,
+    artist: 'ärtist' + rn,
     albumartist: 'albumartist' + rn,
     title: 'title' + rn,
     album: 'album' + rn,
@@ -64,7 +64,7 @@ test('sync write/read', assert => {
 
   const tags = taglib2.readTagsSync(audiopath)
 
-  assert.equal(tags.artist, 'artist' + rn)
+  assert.equal(tags.artist, 'ärtist' + rn)
   assert.equal(tags.albumartist, 'albumartist' + rn)
   assert.equal(tags.title, 'title' + rn)
   assert.equal(tags.bpm, 120)
