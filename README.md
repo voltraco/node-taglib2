@@ -2,6 +2,14 @@
 taglib version 2 bindings
 
 # USAGE
+If you are trying to *read* tags "in the hot path", meaning you care about
+performance, don't use a native module, stay in javascript-land.
+
+[`Here`](https://github.com/leetreveil/musicmetadata) is a good module for
+parsing meta data. However, if you need to *write* data, you may find this
+library useful. Keep in mind, performance is acceptable for one-off writes,
+but it takes about 1 second for 100 writes on a low-end macbook.
+
 ### WRITING TAGS
 A `cover`, can be any image type, but you need to specify the mimetype,
 to find the mimetype, we use [`node-mime`](https://github.com/broofa/node-mime).
