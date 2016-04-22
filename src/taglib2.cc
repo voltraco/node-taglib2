@@ -25,39 +25,8 @@
 #include <tbytevector.h>
 #include <tbytevectorlist.h>
 
-//#include <mp4tag.h>
-//#include <mp4atom.h>
-//#include <mp4file.h>
-
 using namespace std;
 using namespace v8;
-
-bool isFile(const char *s) {
-  struct stat st;
-#ifdef _WIN32
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
-#else
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
-#endif
-}
-
-void checkForRejectedProperties(const TagLib::PropertyMap &tags) {
-  if(tags.size() > 0) {
-    unsigned int longest = 0;
-    for(TagLib::PropertyMap::ConstIterator i = tags.begin(); i != tags.end(); ++i) {
-      if(i->first.size() > longest) {
-        longest = i->first.size();
-      }
-    }
-    //cout << "-- rejected TAGs (properties) --" << endl;
-    for(TagLib::PropertyMap::ConstIterator i = tags.begin(); i != tags.end(); ++i) {
-      for(TagLib::StringList::ConstIterator j = i->second.begin(); j != i->second.end(); ++j) {
-        // TODO build and return a JSON object
-        //cout << left << std::setw(longest) << i->first << " - " << '"' << *j << '"' << endl;
-      }
-    }
-  }
-}
 
 Local<Value> TagLibStringToString(TagLib::String s) {
 
@@ -73,6 +42,15 @@ Local<Value> TagLibStringToString(TagLib::String s) {
 
 TagLib::String StringToTagLibString(std::string s) {
   return TagLib::String(s, TagLib::String::UTF8);
+}
+
+bool isFile(const char *s) {
+  struct stat st;
+#ifdef _WIN32
+  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
+#else
+  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
+#endif
 }
 
 NAN_METHOD(writeTagsSync) {
