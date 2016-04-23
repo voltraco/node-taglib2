@@ -108,11 +108,18 @@ NAN_METHOD(writeTagsSync) {
     map.insert(TagLib::String("ALBUMARTIST"), value);
   }
 
-  if (hasOption("disknumber")) {
+  if (hasOption("discnumber")) {
     hasProps = true;
-    TagLib::String value = getOptionString("disknumber");
-    map.erase(TagLib::String("DISKNUMBER"));
-    map.insert(TagLib::String("DISKNUMBER"), value);
+    TagLib::String value = getOptionString("discnumber");
+    map.erase(TagLib::String("DISCNUMBER"));
+    map.insert(TagLib::String("DISCNUMBER"), value);
+  }
+
+  if (hasOption("tracknumber")) {
+    hasProps = true;
+    TagLib::String value = getOptionString("tracknumber");
+    map.erase(TagLib::String("TRACKNUMBER"));
+    map.insert(TagLib::String("TRACKNUMBER"), value);
   }
 
   if (hasOption("composer")) {
@@ -207,10 +214,17 @@ NAN_METHOD(readTagsSync) {
     );
   }
 
-  if (map.contains("DISKNUMBER")) {
+  if (map.contains("DISCNUMBER")) {
     obj->Set(
-      Nan::New("disknumber").ToLocalChecked(),
-      TagLibStringToString(map["DISKNUMBER"].toString(","))
+      Nan::New("discnumber").ToLocalChecked(),
+      TagLibStringToString(map["DISCNUMBER"].toString(","))
+    );
+  }
+
+  if (map.contains("TRACKNUMBER")) {
+    obj->Set(
+      Nan::New("tracknumber").ToLocalChecked(),
+      TagLibStringToString(map["TRACKNUMBER"].toString(","))
     );
   }
 

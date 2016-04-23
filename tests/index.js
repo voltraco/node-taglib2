@@ -49,8 +49,9 @@ test('sync write/read', assert => {
     comment: 'comment' + rn,
     genre: 'genre' + rn,
     year: rn_year,
-    track: 3 + rn,
-    disknumber: '1' + rn,
+    //track: 3 + rn,
+    tracknumber: '3/' + rn,
+    discnumber: '1/' + rn,
     composer: 'composer' + rn,
     mimetype: 'image/jpeg',
     cover: imagefile 
@@ -71,10 +72,11 @@ test('sync write/read', assert => {
   assert.equal(tags.album, 'album' + rn)
   assert.equal(tags.comment, 'comment' + rn)
   assert.equal(tags.genre, 'genre' + rn)
-  assert.equal(tags.year, parseInt(rn_year), 10)
-  assert.equal(tags.disknumber, '1' + rn)
+  assert.equal(tags.year, parseInt(rn_year, 10))
+  assert.equal(tags.discnumber, '1/' + rn)
   assert.equal(tags.composer, 'composer' + rn)
-  assert.equal(tags.track, 3 + rn)
+  //assert.equal(tags.track, 3 + rn)
+  assert.equal(tags.tracknumber, '3/' + rn)
 
   const tmpImagepath = TMP_PATH + '/sample.jpg'
   fs.writeFileSync(tmpImagepath, tags.pictures[0])

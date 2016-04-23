@@ -2,13 +2,6 @@
 taglib version 2 bindings
 
 # USAGE
-If you are trying to *read* tags "in the hot path", meaning you care about
-performance, don't use a native module, stay in javascript-land.
-
-[`Here`](https://github.com/leetreveil/musicmetadata) is a good module for
-parsing meta data. However, if you need to *write* data, you may find this
-library useful. Keep in mind, performance is acceptable for one-off writes,
-but it takes about 1 second for 100 writes on a low-end macbook.
 
 ### WRITING TAGS
 A `cover`, can be any image type, but you need to specify the mimetype,
@@ -26,12 +19,16 @@ const props = {
   genre: 'blues',
   year: 1951,
   track: 3,
+  tracknumber: '1/1',
+  discnumber: '1/1',
   mimetype: mime('./cover.jpg'),
   cover: fs.readFileSync('./cover.jpg')
 }
 
 taglib.writeTagsSync('./file.mp3', props)
 ```
+
+Note that `track` will overwrite `tracknumber` if specified in the same write.
 
 ### READING TAGS
 
@@ -54,6 +51,8 @@ const tags = taglib.readTagsSync('./file.mp3')
   "genre": "blues",
   "year": 1951,
   "track": 3,
+  "tracknumber": "3/3",
+  "discnumber": "1/1",
   "cover": [],
   "bitrate": 192,
   "bpm": 120,
