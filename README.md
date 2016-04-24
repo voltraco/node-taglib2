@@ -21,8 +21,12 @@ const props = {
   track: 3,
   tracknumber: '1/1',
   discnumber: '1/1',
-  mimetype: mime('./cover.jpg'),
-  cover: fs.readFileSync('./cover.jpg')
+  pictures: [
+    {
+      "mimetype": mime('./cover.jpg'),
+      "picture": fs.readFileSync('./cover.jpg')
+    } 
+  ],
 }
 
 taglib.writeTagsSync('./file.mp3', props)
@@ -53,7 +57,12 @@ const tags = taglib.readTagsSync('./file.mp3')
   "track": 3,
   "tracknumber": "3/3",
   "discnumber": "1/1",
-  "cover": [],
+  "pictures": [
+    {
+      "mimetype": "image/jpeg",
+      "picture": <Buffer ff d8 ff e0 00 10 4a 46 49 46 00 01 ... >
+    } 
+  ],
   "bitrate": 192,
   "bpm": 120,
   "samplerate": 44100,

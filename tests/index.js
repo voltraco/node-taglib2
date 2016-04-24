@@ -53,8 +53,8 @@ test('sync write/read', assert => {
     tracknumber: '3/' + rn,
     discnumber: '1/' + rn,
     composer: 'composer' + rn,
-    mimetype: 'image/jpeg',
-    cover: imagefile 
+    //mimetype: 'image/jpeg',
+    pictures: [{ mimetype: '', picture: imagefile }]
   })
 
   assert.ok(r)
@@ -79,7 +79,7 @@ test('sync write/read', assert => {
   assert.equal(tags.tracknumber, '3/' + rn)
 
   const tmpImagepath = TMP_PATH + '/sample.jpg'
-  fs.writeFileSync(tmpImagepath, tags.pictures[0])
+  fs.writeFileSync(tmpImagepath, tags.pictures[0].picture)
 
   assert.equal(tags.bitrate, 192)
   assert.equal(tags.samplerate, 44100)
@@ -108,8 +108,10 @@ test('sync write/read m4a + jpg', assert => {
 
   assert.comment('write a copy of an mp4 file with a new image')
   const r = taglib2.writeTagsSync(audiopath, {
-    mimetype: 'image/jpeg',
-    cover: imagefile 
+    pictures: [{
+      mimetype: 'image/jpeg',
+      picture: imagefile 
+    }]
   })  
 
   assert.comment('read the tags from the new file')
@@ -117,7 +119,7 @@ test('sync write/read m4a + jpg', assert => {
 
   assert.comment('write the picture to a tmp file')
   const tmpImagepath = TMP_PATH + '/sample.jpg'
-  fs.writeFileSync(tmpImagepath, tags.pictures[0])
+  fs.writeFileSync(tmpImagepath, tags.pictures[0].picture)
 
   assert.comment('compare the image extracted to the image added')
 
@@ -143,8 +145,10 @@ test('sync write/read m4a + png', assert => {
 
   assert.comment('write a copy of an mp4 file with a new image')
   const r = taglib2.writeTagsSync(audiopath, {
-    mimetype: 'image/png',
-    cover: imagefile 
+    pictures: [{
+      mimetype: 'image/png',
+      picture: imagefile
+    }]
   })
 
   assert.comment('read the tags from the new file')
@@ -152,7 +156,7 @@ test('sync write/read m4a + png', assert => {
 
   assert.comment('write the picture to a tmp file')
   const tmpImagepath = TMP_PATH + '/sample.png'
-  fs.writeFileSync(tmpImagepath, tags.pictures[0])
+  fs.writeFileSync(tmpImagepath, tags.pictures[0].picture)
 
   assert.comment('compare the image extracted to the image added')
 
