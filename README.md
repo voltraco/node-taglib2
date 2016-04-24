@@ -4,12 +4,12 @@ taglib version 2 bindings
 # USAGE
 
 ### WRITING TAGS
-A `cover`, can be any image type, but you need to specify the mimetype,
-to find the mimetype, we use [`node-mime`](https://github.com/broofa/node-mime).
+Note that `track` will overwrite `tracknumber` if specified in the same write.
 
 ```js
 const taglib = require('taglib2')
 const mime = require('node-mime')
+const fs = require('fs')
 
 const props = {
   artist: 'Howlin\' Wolf',
@@ -32,8 +32,6 @@ const props = {
 taglib.writeTagsSync('./file.mp3', props)
 ```
 
-Note that `track` will overwrite `tracknumber` if specified in the same write.
-
 ### READING TAGS
 
 ```js
@@ -42,7 +40,7 @@ const tags = taglib.readTagsSync('./file.mp3')
 ```
 
 #### OUTPUT
-`tags.cover` will be an array of buffers that contain image data.
+`tags.pictures` will be an array of buffers that contain image data.
 
 ```json
 {
