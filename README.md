@@ -2,6 +2,11 @@
 taglib version 2 bindings
 
 # USAGE
+For example, with electron...
+
+```
+ELECTRON=1 npm install
+```
 
 ### WRITING TAGS
 Note that `track` will overwrite `tracknumber` if specified in the same write.
