@@ -32,7 +32,7 @@ if(VISIBILITY_HIDDEN)
 endif()
 
 option(BUILD_TESTS "Build the test suite" OFF)
-option(BUILD_EXAMPLES "Build the examples" ON)
+option(BUILD_EXAMPLES "Build the examples" OFF)
 option(BUILD_BINDINGS "Build the bindings" ON)
 
 option(NO_ITUNES_HACKS "Disable workarounds for iTunes bugs" OFF)

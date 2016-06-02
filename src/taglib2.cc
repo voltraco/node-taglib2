@@ -54,6 +54,7 @@ bool isFile(const char *s) {
 }
 
 NAN_METHOD(writeTagsSync) {
+  Nan::HandleScope scope;
   Local<v8::Object> options;
 
   if (info.Length() < 2) {
@@ -221,6 +222,7 @@ NAN_METHOD(writeTagsSync) {
 }
 
 NAN_METHOD(readTagsSync) {
+  Nan::HandleScope scope;
 
   if (!info[0]->IsString()) {
     Nan::ThrowTypeError("Expected a path to audio file");
