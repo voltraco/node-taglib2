@@ -4,8 +4,7 @@
   "description": "taglib version2 bindings",
   "dependencies": {
     "cmake-js": "2",
-    "nan": "2",
-    "npm": "^3.8.6"
+    "nan": "2"
   },
   "scripts": {
     "test": "tape ./tests",
