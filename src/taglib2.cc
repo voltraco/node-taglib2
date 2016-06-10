@@ -257,6 +257,13 @@ NAN_METHOD(readTagsSync) {
     TagLibStringToString(tag->artist())
   );
 
+  if (map.contains("COMPILATION")) {
+    obj->Set(
+      Nan::New("compilation").ToLocalChecked(),
+      TagLibStringToString(map["COMPILATION"].toString(","))
+    );
+  }
+
   if (map.contains("ALBUMARTIST")) {
     obj->Set(
       Nan::New("albumartist").ToLocalChecked(),
