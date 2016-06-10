@@ -70,6 +70,7 @@ const tags = taglib.readTagsSync('./file.mp3')
   "bpm": 120,
   "samplerate": 44100,
   "channels": 2,
+  "compilation": false,
   "time": "1:30",
   "length": 90
 }
