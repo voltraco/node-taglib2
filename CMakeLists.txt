@@ -11,6 +11,11 @@ set(REVISION "31f3109")
 #
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(SUPPORT_LARGE_FILES ON)
+if(UNIX AND NOT APPLE)
+  set(CMAKE_CXX_FLAGS "-fPIC -std=c++1z -stdlib=libc++")
+else()
+  set(CMAKE_CXX_FLAGS "-std=c++1z -stdlib=libc++")
+endif()
 
 #
 # headers
