@@ -1,6 +1,6 @@
 {
   "name": "taglib2",
-  "version": "2.5.8",
+  "version": "2.5.9",
   "description": "taglib version2 bindings",
   "dependencies": {
     "cmake-js": "2",
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "tape ./tests",
-    "install": "bash ./install.sh"
+    "install":"if test \"$ELECTRON\"; then CC=clang CXX=clang++ cmake-js rebuild -r electron -v 1.2.7 -a ia64; else cmake-js compile; fi"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
