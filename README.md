@@ -1,6 +1,16 @@
 # SYNOPSIS
 taglib version 2 bindings
 
+# INSTALATION
+
+### OSX/Linux
+
+You need to have installed a proper C/C++ compiler toolchain, like GCC (For OSX please download [Xcode and Command Line Tools](https://developer.apple.com/xcode/))
+
+### Windows
+
+You need to have Visual C++ Build Environment setup, which you can download as a standalone [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) package or get it as part of [Visual Studio 2015](https://www.visualstudio.com/products/visual-studio-community-vs).
+
 # USAGE
 For example, with electron...
 
@@ -75,4 +85,3 @@ const tags = taglib.readTagsSync('./file.mp3')
   "length": 90
 }
 ```
-

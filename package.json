@@ -2,13 +2,16 @@
   "name": "taglib2",
   "version": "2.5.15",
   "description": "taglib version2 bindings",
-  "dependencies": {
-    "cmake-js": "2",
-    "nan": "^2.4.0"
-  },
   "scripts": {
     "test": "tape ./tests",
-    "install": "if test \"$ELECTRON\"; then CC=clang CXX=clang++ cmake-js rebuild -r electron -v 1.3.3 --abi=49 -a ia64; else cmake-js compile; fi"
+    "compile:electron": "cmake-js rebuild -r electron -v 1.3.4 --abi=49 -a ia64 -C -s=c++11",
+    "compile": "cmake-js rebuild",
+    "build": "node compile.js"
+  },
+  "dependencies": {
+    "shelljs": "^0.7.4",
+    "cmake-js": "2",
+    "nan": "^2.4.0"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
