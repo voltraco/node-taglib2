@@ -1,6 +1,9 @@
 # SYNOPSIS
 taglib version 2 bindings
 
+# BUILD STATUS
+[![Build status](https://ci.appveyor.com/api/projects/status/fkt7jiqubahuja5o?svg=true)](https://ci.appveyor.com/project/0x00A/node-taglib2)
+
 # INSTALATION
 
 ### OSX/Linux
