@@ -26,12 +26,11 @@ test_script:
   # Output useful info for debugging.
   - node --version && npm --version
   - ps: "npm test # PowerShell" # Pass comment to PS for easier debugging
-  - cmd: npm test
 
 build: off
 
 matrix:
   fast_finish: true
-  
+
 cache:
-  - node_modules -> package.json   
+  - node_modules -> package.json
