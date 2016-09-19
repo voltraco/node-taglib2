@@ -1,0 +1,21 @@
+sudo: false
+language: node_js
+compiler: clang-3.6
+node_js:
+  - "6"
+env:
+  - CXX=clang-3.6
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise-3.6
+      - ubuntu-toolchain-r-test
+      - george-edison55-precise-backports
+    packages:
+      - clang-3.6
+      - g++-4.8
+      - cmake
+      - cmake-data
+matrix:
+  include:
+    - node_js: "6.2"

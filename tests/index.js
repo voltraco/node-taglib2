@@ -53,6 +53,7 @@ test('sync write/read', assert => {
     tracknumber: '3/' + rn,
     discnumber: '1/' + rn,
     composer: 'composer' + rn,
+    bpm: parseInt(120, 10),
     //mimetype: 'image/jpeg',
     pictures: [{ mimetype: '', picture: imagefile }]
   })

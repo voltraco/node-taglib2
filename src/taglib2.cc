@@ -3,6 +3,7 @@
 
 #include <v8.h>
 #include <nan.h>
+#include <node.h>
 #include <node_buffer.h>
 
 #include <fstream>
@@ -16,17 +17,19 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-#include <tag.h>
-#include <tlist.h>
-#include <fileref.h>
-#include <tfile.h>
-#include <tpicturemap.h>
-#include <tpropertymap.h>
-#include <tbytevector.h>
-#include <tbytevectorlist.h>
+#define TAGLIB_STATIC
+#include <taglib/tag.h>
+#include <taglib/tlist.h>
+#include <taglib/fileref.h>
+#include <taglib/tfile.h>
+#include <taglib/tpicturemap.h>
+#include <taglib/tpropertymap.h>
+#include <taglib/tbytevector.h>
+#include <taglib/tbytevectorlist.h>
 
 using namespace std;
 using namespace v8;
+using namespace node;
 
 Local<Value> TagLibStringToString(TagLib::String s) {
 
@@ -400,7 +403,7 @@ NAN_METHOD(readTagsSync) {
   info.GetReturnValue().Set(obj);
 }
 
-void Init(v8::Local<v8::Object> exports) {
+void Init(v8::Local<v8::Object> exports, v8::Local<v8::Value> module, void *) {
   exports->Set(Nan::New("writeTagsSync").ToLocalChecked(),
     Nan::New<v8::FunctionTemplate>(writeTagsSync)->GetFunction());
 
@@ -409,4 +412,3 @@ void Init(v8::Local<v8::Object> exports) {
 }
 
 NODE_MODULE(taglib2, Init)
-

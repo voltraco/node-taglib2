@@ -4,44 +4,64 @@ project (taglib2)
 #
 # a relatively stable snapshot of taglib2 branch for our purposes.
 #
-set(REVISION "31f3109")
+set(REVISION "a64772a832fb0f4ce1981f31a882d6974ec61ea5")
 
 #
-# options
+# import ExternalProject module
+#
+include(ExternalProject)
+
+#
+# compiler options
 #
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(SUPPORT_LARGE_FILES ON)
 if(UNIX AND NOT APPLE)
-  set(CMAKE_CXX_FLAGS "-fPIC -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11")
+elseif(MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
 else()
-  set(CMAKE_CXX_FLAGS "-std=c++1z -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++")
 endif()
 
 #
-# headers
+# debug info
 #
-macro(HEADER_DIRECTORIES start return_list)
-  file(GLOB_RECURSE new_list ${start}/*.h)
-  set(dir_list "")
-  foreach(file_path ${new_list})
-      get_filename_component(dir_path ${file_path} PATH)
-      set(dir_list ${dir_list} ${dir_path})
-  endforeach()
-  list(REMOVE_DUPLICATES dir_list)
-  set(${return_list} ${dir_list})
-endmacro()
-
-HEADER_DIRECTORIES(lib/taglib-${REVISION} TAGLIB_HEADERS)
-
-set(HEADERS
-  ${TAGLIB_HEADERS})
-
-include_directories(${HEADERS})
+MESSAGE(STATUS "runtime:" ${NODE_RUNTIME})
+MESSAGE(STATUS "runtime version:" ${NODE_RUNTIMEVERSION})
+MESSAGE(STATUS "architecture:" ${NODE_ARCH})
 
 #
-# snapshot of taglib
+# download and make TagLib
 #
-add_subdirectory(lib/taglib-${REVISION})
+ExternalProject_Add(
+  taglib
+  PREFIX "${CMAKE_SOURCE_DIR}/taglib"
+  GIT_REPOSITORY https://github.com/taglib/taglib
+  GIT_TAG ${REVISION}
+  INSTALL_DIR "${CMAKE_SOURCE_DIR}/taglib"
+  CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_SOURCE_DIR}/taglib"
+  CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
+)
+
+#
+# force rebuild of TagLib source (useful when switching between node/electron)
+#
+ExternalProject_Add_Step(
+  taglib
+  forcebuild
+  COMMAND ${CMAKE_COMMAND} -E echo_append ""
+  COMMENT "Forcing build step for taglib"
+  DEPENDEES configure
+  DEPENDERS build
+  ALWAYS 1
+)
+
+#
+# include TagLib
+#
+link_directories(${CMAKE_SOURCE_DIR}/taglib/lib)
+include_directories(BEFORE ${CMAKE_JS_INC} ${CMAKE_SOURCE_DIR}/taglib/include)
 
 #
 # node-taglib2 specifics
@@ -49,11 +69,13 @@ add_subdirectory(lib/taglib-${REVISION})
 file(GLOB SOURCE_FILES "src/*.cc" "src/*.h")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_JS_INC})
 
 #
-# link taglib and cmakejs
+# add TagLib as a dependency (after project has been defined)
 #
-target_link_libraries(${PROJECT_NAME} tag)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB})
+add_dependencies(${PROJECT_NAME} taglib)
 
+#
+# link TagLib and cmakejs
+#
+target_link_libraries(${PROJECT_NAME} ${CMAKE_JS_LIB} tag)
