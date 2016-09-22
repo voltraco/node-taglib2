@@ -290,7 +290,7 @@ NAN_METHOD(readTagsSync) {
 
   if (map.contains("BPM")) {
     TagLib::String sl = map["BPM"].toString("");
-    TagLib::ByteVector vec = sl.data(TagLib::String::Latin1);
+    TagLib::ByteVector vec = sl.data(TagLib::String::UTF8);
     char* s = vec.data();
 
     obj->Set(
@@ -338,7 +338,7 @@ NAN_METHOD(readTagsSync) {
     int picIndex = 0;
 
     for (auto& p : tag->pictures()) {
-  
+
       v8::Local<v8::Object> imgObj = Nan::New<v8::Object>();
 
       auto data = p.second[0].data();
