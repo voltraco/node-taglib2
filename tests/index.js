@@ -3,25 +3,28 @@ const fs = require('fs')
 const taglib2 = require('../index')
 const test = require('tape')
 const mkdirp = require('mkdirp')
+const path = require('path')
 const rimraf = require('rimraf')
 
-const TMP_PATH = __dirname + '/tmp'
-const FIXTURES_PATH = __dirname + '/fixtures'
+const TMP_PATH = path.join(__dirname, '/tmp')
+const FIXTURES_PATH = path.join(__dirname, '/fixtures')
 
 test('setup', assert => {
-  try { fs.statSync(TMP_PATH) }
-  catch(_) { mkdirp.sync(TMP_PATH) }
+  try {
+    fs.statSync(TMP_PATH)
+  } catch (_) {
+    mkdirp.sync(TMP_PATH)
+  }
   assert.end()
 })
 
 rimraf.sync(TMP_PATH + '/*')
 
 test('sync write/read', assert => {
-
-  function getRandomYear() {
-    const date = new Date
+  function getRandomYear () {
+    const date = new Date()
     const from = date.setFullYear(1877, 0, 1)
-    const to = (new Date).getTime()
+    const to = (new Date()).getTime()
     return new Date(from + Math.random() * (to - from)).getFullYear()
   }
 
@@ -49,12 +52,12 @@ test('sync write/read', assert => {
     comment: 'comment' + rn,
     genre: 'genre' + rn,
     year: rn_year,
-    //track: 3 + rn,
+    // track: 3 + rn,
     tracknumber: '3/' + rn,
     discnumber: '1/' + rn,
     composer: 'composer' + rn,
     bpm: parseInt(120, 10),
-    //mimetype: 'image/jpeg',
+    // mimetype: 'image/jpeg',
     pictures: [{ mimetype: '', picture: imagefile }]
   })
 
@@ -76,7 +79,7 @@ test('sync write/read', assert => {
   assert.equal(tags.year, parseInt(rn_year, 10))
   assert.equal(tags.discnumber, '1/' + rn)
   assert.equal(tags.composer, 'composer' + rn)
-  //assert.equal(tags.track, 3 + rn)
+  // assert.equal(tags.track, 3 + rn)
   assert.equal(tags.tracknumber, '3/' + rn)
 
   const tmpImagepath = TMP_PATH + '/sample.jpg'
@@ -97,7 +100,6 @@ test('sync write/read', assert => {
 })
 
 test('sync write/read m4a + jpg', assert => {
-
   const rn = Math.floor(Math.random() * 100)
   const rn_year = Math.floor(Math.random() * 1000)
 
@@ -111,9 +113,9 @@ test('sync write/read m4a + jpg', assert => {
   const r = taglib2.writeTagsSync(audiopath, {
     pictures: [{
       mimetype: 'image/jpeg',
-      picture: imagefile 
+      picture: imagefile
     }]
-  })  
+  })
 
   assert.comment('read the tags from the new file')
   const tags = taglib2.readTagsSync(audiopath)
@@ -132,9 +134,7 @@ test('sync write/read m4a + jpg', assert => {
   assert.end()
 })
 
-
 test('sync write/read m4a + png', assert => {
-
   const rn = Math.floor(Math.random() * 100)
   const rn_year = Math.floor(Math.random() * 1000)
 

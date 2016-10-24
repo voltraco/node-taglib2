@@ -293,10 +293,16 @@ NAN_METHOD(readTagsSync) {
     TagLib::ByteVector vec = sl.data(TagLib::String::UTF8);
     char* s = vec.data();
 
+    int i = 0;
+
+    if (s) {
+      i = atoi(s);
+    }
+
     obj->Set(
       Nan::New("bpm").ToLocalChecked(),
-      Nan::New<v8::Integer>(atoi(s))
-    );
+      Nan::New<v8::Integer>(i)
+    ); 
   }
 
   if (map.contains("COMPOSER")) {
