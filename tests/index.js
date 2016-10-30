@@ -32,7 +32,7 @@ const FIXTURES_PATH = path.join(__dirname, '/fixtures')
     const ws = fs.createWriteStream(flacfile)
     http.get(flacfilesource, res => {
       res.pipe(ws)
-      ws.on('finish', onReady)
+      ws.on('end', onReady)
     })
   })
 })()
@@ -41,6 +41,9 @@ function onReady () {
   test('extract images from flac', assert => {
     // extrat the images in the flac file (this file we know has 6 images)
     const p = FIXTURES_PATH + '/classical.flac'
+    const ps = fs.statSync(p)
+    assert.ok(ps.size > 0, 'flac file downloaded properly')
+
     const tags = taglib2.readTagsSync(p)
     assert.equal(tags.pictures.length, 6)
 
