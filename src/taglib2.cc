@@ -17,11 +17,16 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
+#define NDEBUG
 #define TAGLIB_STATIC
 #include <taglib/tag.h>
 #include <taglib/tlist.h>
 #include <taglib/fileref.h>
 #include <taglib/tfile.h>
+#include <taglib/flacfile.h>
+#include <taglib/mp4tag.h>
+#include <taglib/mp4atom.h>
+#include <taglib/mp4file.h>
 #include <taglib/tpicturemap.h>
 #include <taglib/tpropertymap.h>
 #include <taglib/tbytevector.h>
@@ -239,6 +244,16 @@ NAN_METHOD(readTagsSync) {
     return;
   }
 
+  string ext;
+  const size_t pos = audio_file.find_last_of(".");
+
+  if (pos != -1) {
+    ext = audio_file.substr(pos + 1);
+
+    for (std::string::size_type i = 0; i < ext.length(); ++i)
+      ext[i] = std::toupper(ext[i]);
+  }
+
   TagLib::FileRef f(audio_file.c_str());
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
@@ -266,6 +281,13 @@ NAN_METHOD(readTagsSync) {
       TagLibStringToString(map["COMPILATION"].toString(","))
     );
   }
+
+  /* if (map.contains("ENCODER")) {
+    obj->Set(
+      Nan::New("encoder").ToLocalChecked(),
+      TagLibStringToString(map["ENCODER"].toString(","))
+    );
+  }*/
 
   if (map.contains("ALBUMARTIST")) {
     obj->Set(
@@ -337,7 +359,47 @@ NAN_METHOD(readTagsSync) {
     Nan::New<v8::Integer>(tag->year())
   );
 
-  if (!tag->pictures().isEmpty()) {
+  // Ok, this was a quick fix. And I'll admit, opening another handle to the
+  // file is not the greatest way to get the pictures for flac files. It seems
+  // like this should be managed by the tag->pictures() method on FileRef, but
+  // isn't, open to changes here.
+  if (audio_file.find(".flac") != std::string::npos) {
+
+    TagLib::FLAC::File flacfile(audio_file.c_str());
+    TagLib::List<TagLib::FLAC::Picture *> list = flacfile.pictureList();
+
+    size_t arraySize = list.size();
+    v8::Local<v8::Array> pictures = Nan::New<v8::Array>(arraySize);
+
+    int picIndex = 0;
+
+    for (auto& p : list) {
+
+      v8::Local<v8::Object> imgObj = Nan::New<v8::Object>();
+
+      auto data = p->data();
+      auto datasize = data.size();
+      const char* rawdata = data.data();
+
+      v8::Local<v8::Object> buf = Nan::NewBuffer(datasize).ToLocalChecked();
+      memcpy(node::Buffer::Data(buf), rawdata, datasize);
+
+      imgObj->Set(
+        Nan::New("mimetype").ToLocalChecked(),
+        TagLibStringToString(p->mimeType())
+      );
+
+      imgObj->Set(
+        Nan::New("picture").ToLocalChecked(),
+        buf
+      );
+
+      pictures->Set(picIndex++, imgObj);
+    }
+
+    obj->Set(Nan::New("pictures").ToLocalChecked(), pictures);
+  }
+  else if (!tag->pictures().isEmpty()) {
 
     size_t arraySize = tag->pictures().size();
     v8::Local<v8::Array> pictures = Nan::New<v8::Array>(arraySize);
@@ -370,7 +432,7 @@ NAN_METHOD(readTagsSync) {
     obj->Set(Nan::New("pictures").ToLocalChecked(), pictures);
   }
 
-  if(f.audioProperties()) {
+  if (f.audioProperties()) {
 
     TagLib::AudioProperties *properties = f.audioProperties();
 
@@ -391,6 +453,23 @@ NAN_METHOD(readTagsSync) {
       Nan::New("channels").ToLocalChecked(),
       Nan::New<v8::Integer>(properties->channels())
     );
+
+    // this is the same hackery, a second read, is required to get the codec
+    // since codec isn't always a member of audioProperties. There should be
+    // a better way of getting properties that are unique to each format.
+    if (ext == "M4A" || ext == "MP4") {
+      TagLib::MP4::File mp4file(audio_file.c_str());
+      if (mp4file.audioProperties()) {
+        auto codec = mp4file.audioProperties()->codec();
+
+        string encoding = codec == 2 ? "alac" : "aac";
+
+        obj->Set(
+          Nan::New("codec").ToLocalChecked(),
+          Nan::New<v8::String>(encoding).ToLocalChecked()
+        );
+      }
+    }
 
     stringstream ss;
     ss << minutes << ":" << setfill('0') << setw(2) << seconds;
