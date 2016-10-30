@@ -7,6 +7,7 @@
 #include <node_buffer.h>
 
 #include <fstream>
+#include <cctype>
 #include <iostream>
 #include <iomanip>
 #include <sstream>

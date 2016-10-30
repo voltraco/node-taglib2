@@ -30,7 +30,10 @@ const FIXTURES_PATH = path.join(__dirname, '/fixtures')
     if (!err) return onReady()
 
     const ws = fs.createWriteStream(flacfile)
-    http.get(flacfilesource, res => res.pipe(ws).on('end', onReady))
+    http.get(flacfilesource, res => {
+      res.pipe(ws)
+      ws.on('finish', onReady)
+    })
   })
 })()
 

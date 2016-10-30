@@ -6,6 +6,7 @@ npn-debug.*
 
 /taglib
 /tests/tmp
+/tests/fixtures/classical.flac
 /build
 /node_modules
 
