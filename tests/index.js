@@ -44,7 +44,7 @@ function onReady () {
     const ps = fs.statSync(p)
     assert.ok(ps.size > 0, 'flac file downloaded properly')
 
-    const tags = taglib2.readTagsSync(p)
+    const tags = taglib2.readTagsSync(p, { md5: true })
     assert.equal(tags.pictures.length, 6)
 
     // write the first one to the tmp directory
@@ -55,6 +55,7 @@ function onReady () {
     // compare the extracted one to the original image
     const extractedImage = fs.readFileSync(writepath)
     const originalImage = fs.readFileSync(FIXTURES_PATH + '/classical.jpeg')
+    assert.equal(tags.md5, '5d6a560f13c2b9c7cbf99b3ac7dbbe81')
     assert.equal(extractedImage.length, originalImage.length)
     assert.end()
   })
@@ -106,7 +107,7 @@ function onReady () {
       taglib2.readTagsSync()
     }, 'not enough arguments')
 
-    const tags = taglib2.readTagsSync(audiopath)
+    const tags = taglib2.readTagsSync(audiopath, { md5: true })
 
     assert.equal(tags.artist, 'ärtist' + rn)
     assert.equal(tags.albumartist, 'albumartist' + rn)
@@ -155,7 +156,7 @@ function onReady () {
     })
 
     assert.comment('read the tags from the new file')
-    const tags = taglib2.readTagsSync(audiopath)
+    const tags = taglib2.readTagsSync(audiopath, { md5: true })
 
     assert.comment('write the picture to a tmp file')
     const tmpImagepath = TMP_PATH + '/sample.jpg'
@@ -188,7 +189,7 @@ function onReady () {
     })
 
     assert.comment('read the tags from the new file')
-    const tags = taglib2.readTagsSync(audiopath)
+    const tags = taglib2.readTagsSync(audiopath, { md5: true })
 
     assert.comment('write the picture to a tmp file')
     const tmpImagepath = TMP_PATH + '/sample.png'

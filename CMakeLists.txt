@@ -66,7 +66,7 @@ include_directories(BEFORE ${CMAKE_JS_INC} ${CMAKE_SOURCE_DIR}/taglib/include)
 #
 # node-taglib2 specifics
 #
-file(GLOB SOURCE_FILES "src/*.cc" "src/*.h")
+file(GLOB SOURCE_FILES "src/*.cc" "src/*.h" "md5/*.cc" "md5/*.h")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
