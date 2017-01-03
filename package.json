@@ -1,10 +1,10 @@
 {
   "name": "taglib2",
-  "version": "2.7.1",
+  "version": "2.7.2",
   "description": "taglib version2 bindings",
   "scripts": {
     "test": "tape ./tests",
-    "compile:electron": "cmake-js rebuild -r electron -v 1.4.5 --abi=50 -a x64 -C -s c++11",
+    "compile:electron": "cmake-js rebuild -r electron -v 1.4.13 --abi=51 -a x64 -C -s c++11",
     "compile": "cmake-js rebuild",
     "install": "node compile.js"
   },
