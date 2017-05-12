@@ -148,6 +148,13 @@ NAN_METHOD(writeTagsSync) {
     map.insert(TagLib::String("COMPOSER"), value);
   }
 
+  if (hasOption(options, "bpm")) {
+    hasProps = true;
+    TagLib::String value = getOptionString(options, "bpm");
+    map.erase(TagLib::String("BPM"));
+    map.insert(TagLib::String("BPM"), value);
+  }
+
   if (hasProps) {
     f.setProperties(map);
   }
