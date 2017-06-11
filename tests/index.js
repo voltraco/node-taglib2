@@ -94,9 +94,9 @@ function onReady () {
       // track: 3 + rn,
       tracknumber: '3/' + rn,
       discnumber: '1/' + rn,
+      id: rn,
       composer: 'composer' + rn,
       bpm: parseInt(rn, 10),
-      // mimetype: 'image/jpeg',
       pictures: [{ mimetype: '', picture: imagefile }]
     })
 
@@ -117,6 +117,7 @@ function onReady () {
     assert.equal(tags.genre, 'genre' + rn)
     assert.equal(tags.year, parseInt(rn_year, 10))
     assert.equal(tags.discnumber, '1/' + rn)
+    assert.equal(tags.id, rn)
     assert.equal(tags.composer, 'composer' + rn)
     // assert.equal(tags.track, 3 + rn)
     assert.equal(tags.tracknumber, '3/' + rn)
@@ -204,4 +205,3 @@ function onReady () {
     assert.end()
   })
 }
-

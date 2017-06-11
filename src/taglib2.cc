@@ -148,6 +148,13 @@ NAN_METHOD(writeTagsSync) {
     map.insert(TagLib::String("COMPOSER"), value);
   }
 
+  if (hasOption(options, "id")) {
+    hasProps = true;
+    TagLib::String value = getOptionString(options, "id");
+    map.erase(TagLib::String("ID"));
+    map.insert(TagLib::String("ID"), value);
+  }
+
   if (hasOption(options, "bpm")) {
     hasProps = true;
     TagLib::String value = getOptionString(options, "bpm");
@@ -290,12 +297,12 @@ NAN_METHOD(readTagsSync) {
     );
   }
 
-  /* if (map.contains("ENCODER")) {
+  if (map.contains("ID")) {
     obj->Set(
-      Nan::New("encoder").ToLocalChecked(),
-      TagLibStringToString(map["ENCODER"].toString(","))
+      Nan::New("id").ToLocalChecked(),
+      TagLibStringToString(map["ID"].toString(","))
     );
-  }*/
+  }
 
   if (map.contains("ALBUMARTIST")) {
     obj->Set(
@@ -332,7 +339,7 @@ NAN_METHOD(readTagsSync) {
     obj->Set(
       Nan::New("bpm").ToLocalChecked(),
       Nan::New<v8::Integer>(i)
-    ); 
+    );
   }
 
   if (map.contains("COMPOSER")) {
