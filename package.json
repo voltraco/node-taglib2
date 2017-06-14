@@ -4,12 +4,10 @@
   "description": "taglib version2 bindings",
   "scripts": {
     "test": "tape ./tests",
-    "compile:electron": "cmake-js rebuild -r electron -v 1.6.10 --abi=54 -a x64 -C -s c++11",
-    "compile": "cmake-js rebuild",
-    "install": "node compile.js"
+    "install": "cmake-js rebuild -r $npm_config_runtime -v $npm_config_target --abi $npm_config_abi",
+    "rebuild": "npm run install"
   },
   "dependencies": {
-    "shelljs": "^0.7.4",
     "cmake-js": "2",
     "nan": "^2.4.0"
   },
