@@ -1,4 +1,4 @@
-var spawn = require('child_process').spawn
+var spawn = require('win-spawn')
 
 var ps = spawn('cmake-js', [
   'rebuild',
