@@ -4,11 +4,11 @@
   "description": "taglib version2 bindings",
   "scripts": {
     "test": "tape ./tests",
-    "install": "cmake-js rebuild -r $npm_config_runtime -v $npm_config_target --abi $npm_config_abi",
-    "rebuild": "npm run install"
+    "install": "cmake-js install",
+    "rebuild": "cmake-js rebuild"
   },
   "dependencies": {
-    "cmake-js": "2",
+    "cmake-js": "^3.4.1",
     "nan": "^2.4.0"
   },
   "devDependencies": {
