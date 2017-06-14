@@ -1,6 +1,6 @@
 {
   "name": "taglib2",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "taglib version2 bindings",
   "scripts": {
     "test": "tape ./tests",
