@@ -4,8 +4,8 @@
   "description": "taglib version2 bindings",
   "scripts": {
     "test": "tape ./tests",
-    "install": "cmake-js rebuild",
-    "rebuild": "cmake-js rebuild"
+    "install": "node build.js",
+    "rebuild": "node build.js"
   },
   "dependencies": {
     "cmake-js": "^3.4.1",
