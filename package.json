@@ -8,7 +8,7 @@
     "rebuild": "node build.js"
   },
   "dependencies": {
-    "cmake-js": "^3.4.1",
+    "cmake-js": "^3.5.0",
     "nan": "^2.4.0",
     "win-spawn": "^2.0.0"
   },
