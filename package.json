@@ -2,6 +2,10 @@
   "name": "taglib2",
   "version": "2.9.3",
   "description": "taglib version2 bindings",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:voltraco/node-taglib2.git"
+  },
   "scripts": {
     "test": "tape ./tests",
     "install": "node build.js",
