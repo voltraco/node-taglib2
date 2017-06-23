@@ -14,7 +14,7 @@
   "dependencies": {
     "cmake-js": "^3.5.0",
     "nan": "^2.4.0",
-    "prebuildify-load": "^1.0.0",
+    "prebuildify-load": "^1.0.1",
     "win-spawn": "^2.0.0"
   },
   "devDependencies": {
