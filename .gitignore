@@ -9,4 +9,4 @@ npn-debug.*
 /tests/fixtures/classical.flac
 /build
 /node_modules
-
+/prebuilds

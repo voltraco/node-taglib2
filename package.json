@@ -8,17 +8,26 @@
   },
   "scripts": {
     "test": "tape ./tests",
-    "install": "node build.js",
-    "rebuild": "node build.js"
+    "install": "prebuildify-load || node build.js",
+    "upload": "mkdir -p prebuilds && cp build/Release/* prebuilds/ && prebuild --upload-all"
   },
   "dependencies": {
     "cmake-js": "^3.5.0",
     "nan": "^2.4.0",
+    "prebuildify-load": "^1.0.0",
     "win-spawn": "^2.0.0"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
+    "prebuildify": "github:juliangruber/prebuildify#make-build-tool-independent",
     "rimraf": "^2.5.2",
     "tape": "*"
-  }
+  },
+  "files": [
+    "prebuilds",
+    "index.js",
+    "build.js",
+    "LICENSE",
+    "README.md"
+  ]
 }

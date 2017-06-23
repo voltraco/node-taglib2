@@ -1,1 +1,1 @@
-module.exports = require('./build/Release/taglib2')
+module.exports = require('prebuildify-load')(__dirname)
