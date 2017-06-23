@@ -19,3 +19,5 @@ addons:
 matrix:
   include:
     - node_js: "6.2"
+script:
+  - npm test && node prebuild.js
