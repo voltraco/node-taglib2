@@ -453,6 +453,7 @@ NAN_METHOD(readTagsSync) {
 
     int seconds = properties->length() % 60;
     int minutes = (properties->length() - seconds) / 60;
+    int hours = (properties->length() - minutes * 60) / 60;
 
     obj->Set(
       Nan::New("bitrate").ToLocalChecked(),
@@ -487,6 +488,9 @@ NAN_METHOD(readTagsSync) {
     }
 
     stringstream ss;
+    if (hours > 0) {
+      ss << hours << ":" << setfill('0') << setw(2);
+    }
     ss << minutes << ":" << setfill('0') << setw(2) << seconds;
     string s = ss.str();
 
