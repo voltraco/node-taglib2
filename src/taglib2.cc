@@ -247,11 +247,6 @@ NAN_METHOD(writeTagsSync) {
 NAN_METHOD(readTagsSync) {
   Nan::HandleScope scope;
 
-  if (!info[0]->IsString()) {
-    Nan::ThrowTypeError("Expected a path to audio file");
-    return;
-  }
-
   std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
 
   if (!isFile(audio_file.c_str())) {
