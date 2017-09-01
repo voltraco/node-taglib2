@@ -24,7 +24,7 @@ const FIXTURES_PATH = path.join(__dirname, '/fixtures')
     '/custom/eclassical/files/BIS1447-002-flac_24.flac'
   ].join('')
 
-  const flacfile = FIXTURES_PATH + '/classical.flac'
+  const flacfile = FIXTURES_PATH + '/classical å æ ø ö ä ù ó ð.flac'
 
   fs.stat(flacfile, (err, stat) => {
     if (!err) return onReady()
@@ -40,7 +40,7 @@ const FIXTURES_PATH = path.join(__dirname, '/fixtures')
 function onReady () {
   test('extract images from flac', assert => {
     // extrat the images in the flac file (this file we know has 6 images)
-    const p = FIXTURES_PATH + '/classical.flac'
+    const p = FIXTURES_PATH + '/classical å æ ø ö ä ù ó ð.flac'
     const ps = fs.statSync(p)
     assert.ok(ps.size > 0, 'flac file downloaded properly')
 
@@ -70,7 +70,7 @@ function onReady () {
     const rn = Math.floor(Math.random() * 100)
     const rn_year = getRandomYear()
 
-    const audiopath = FIXTURES_PATH + '/sample-output.mp3'
+    const audiopath = FIXTURES_PATH + '/sample-output å æ ø ö ä ù ó ð.mp3'
     fs.writeFileSync(audiopath, fs.readFileSync(FIXTURES_PATH + '/sample.mp3'))
 
     const imagepath = FIXTURES_PATH + '/sample.jpg'
@@ -84,18 +84,18 @@ function onReady () {
     }, 'not enough arguments')
 
     const r = taglib2.writeTagsSync(audiopath, {
-      artist: 'ärtist' + rn,
-      albumartist: 'albumartist' + rn,
-      title: 'title' + rn,
-      album: 'album' + rn,
-      comment: 'comment' + rn,
-      genre: 'genre' + rn,
+      artist: 'å æ ø ö ä ù ó ð ärtist' + rn,
+      albumartist: 'å æ ø ö ä ù ó ð albumartist' + rn,
+      title: 'å æ ø ö ä ù ó ð title' + rn,
+      album: 'å æ ø ö ä ù ó ð album' + rn,
+      comment: 'å æ ø ö ä ù ó ð comment' + rn,
+      genre: 'å æ ø ö ä ù ó ð genre' + rn,
       year: rn_year,
       // track: 3 + rn,
       tracknumber: '3/' + rn,
       discnumber: '1/' + rn,
       id: rn,
-      composer: 'composer' + rn,
+      composer: 'å æ ø ö ä ù ó ð composer' + rn,
       bpm: parseInt(rn, 10),
       pictures: [{ mimetype: '', picture: imagefile }]
     })
@@ -108,17 +108,17 @@ function onReady () {
 
     const tags = taglib2.readTagsSync(audiopath)
 
-    assert.equal(tags.artist, 'ärtist' + rn)
-    assert.equal(tags.albumartist, 'albumartist' + rn)
-    assert.equal(tags.title, 'title' + rn)
+    assert.equal(tags.artist, 'å æ ø ö ä ù ó ð ärtist' + rn)
+    assert.equal(tags.albumartist, 'å æ ø ö ä ù ó ð albumartist' + rn)
+    assert.equal(tags.title, 'å æ ø ö ä ù ó ð title' + rn)
     assert.equal(tags.bpm, rn)
-    assert.equal(tags.album, 'album' + rn)
-    assert.equal(tags.comment, 'comment' + rn)
-    assert.equal(tags.genre, 'genre' + rn)
+    assert.equal(tags.album, 'å æ ø ö ä ù ó ð album' + rn)
+    assert.equal(tags.comment, 'å æ ø ö ä ù ó ð comment' + rn)
+    assert.equal(tags.genre, 'å æ ø ö ä ù ó ð genre' + rn)
     assert.equal(tags.year, parseInt(rn_year, 10))
     assert.equal(tags.discnumber, '1/' + rn)
     assert.equal(tags.id, String(rn))
-    assert.equal(tags.composer, 'composer' + rn)
+    assert.equal(tags.composer, 'å æ ø ö ä ù ó ð composer' + rn)
     // assert.equal(tags.track, 3 + rn)
     assert.equal(tags.tracknumber, '3/' + rn)
 
@@ -140,7 +140,7 @@ function onReady () {
   })
 
   test('sync write/read m4a + jpg', assert => {
-    const audiopath = FIXTURES_PATH + '/sample-output.m4a'
+    const audiopath = FIXTURES_PATH + '/sample-output å æ ø ö ä ù ó ð.m4a'
     fs.writeFileSync(audiopath, fs.readFileSync(FIXTURES_PATH + '/sample.m4a'))
 
     const imagepath = FIXTURES_PATH + '/sample.jpg'
