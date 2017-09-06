@@ -31,3 +31,7 @@ matrix:
 
 cache:
   - node_modules -> package.json
+
+# RDP for debugging purposes
+init:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
