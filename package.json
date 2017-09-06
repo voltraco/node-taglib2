@@ -7,7 +7,7 @@
     "url": "git@github.com:voltraco/node-taglib2.git"
   },
   "scripts": {
-    "test": "tape tests",
+    "test": "node t.js",
     "install": "node build.js",
     "rebuild": "node build.js"
   },
