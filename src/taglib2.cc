@@ -53,40 +53,27 @@ TagLib::String StringToTagLibString(std::string s) {
   return TagLib::String(s, TagLib::String::UTF8);
 }
 
-bool isFile(const char *s) {
-  struct stat st;
-#ifdef _WIN32
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
-#else
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
-#endif
+const wchar_t *GetWC(const char *c) {
+  const size_t cSize = strlen(c);
+  wchar_t* wc = new wchar_t[cSize];
+  mbstowcs (wc, c, cSize);
+  return wc;
 }
 
 NAN_METHOD(writeTagsSync) {
   Nan::HandleScope scope;
   Local<v8::Object> options;
 
-  if (info.Length() < 2) {
-    Nan::ThrowTypeError("Expected 2 arguments");
-    return;
-  }
-
-  if (!info[0]->IsString()) {
-    Nan::ThrowTypeError("Expected a path to audio file");
-    return;
-  }
-
   if (!info[1]->IsObject()) return;
 
   options = v8::Local<v8::Object>::Cast(info[1]);
   std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
 
-  if (!isFile(audio_file.c_str())) {
-    Nan::ThrowTypeError("Audio file not found");
-    return;
-  }
+  #ifdef _WIN32
+    TagLib::FileRef f(GetWC(audio_file.data()));
+  #else
+    TagLib::FileRef f(audio_file.c_str());
 
-  TagLib::FileRef f(audio_file.c_str());
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
 
@@ -249,11 +236,6 @@ NAN_METHOD(readTagsSync) {
 
   std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
 
-  if (!isFile(audio_file.c_str())) {
-    Nan::ThrowTypeError("Audio file not found");
-    return;
-  }
-
   string ext;
   const size_t pos = audio_file.find_last_of(".");
 
@@ -264,7 +246,11 @@ NAN_METHOD(readTagsSync) {
       ext[i] = std::toupper(ext[i]);
   }
 
-  TagLib::FileRef f(audio_file.c_str());
+  #ifdef _WIN32
+    TagLib::FileRef f(GetWC(audio_file.data()));
+  #else
+    TagLib::FileRef f(audio_file.c_str());
+  #endif
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
 
