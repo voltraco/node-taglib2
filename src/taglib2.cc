@@ -73,6 +73,7 @@ NAN_METHOD(writeTagsSync) {
     TagLib::FileRef f(GetWC(audio_file.data()));
   #else
     TagLib::FileRef f(audio_file.c_str());
+  #endif
 
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
@@ -251,6 +252,7 @@ NAN_METHOD(readTagsSync) {
   #else
     TagLib::FileRef f(audio_file.c_str());
   #endif
+  
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
 
