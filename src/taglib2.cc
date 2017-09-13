@@ -244,27 +244,34 @@ NAN_METHOD(writeTagsSync) {
   info.GetReturnValue().Set(Nan::True());
 }
 
+const char* ToCString(const v8::String::Utf8Value& value) {
+  return *value ? *value : "<string conversion failed>";
+}
+
 NAN_METHOD(readTagsSync) {
   Nan::HandleScope scope;
 
-  std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
+  v8::String::Utf8Value str(info[0]);
+  const char* audio_file = ToCString(str);
 
-  if (!isFile(audio_file.c_str())) {
+  std::string filename = *v8::String::Utf8Value(info[0]->ToString());
+
+  if (!isFile(audio_file)) {
     Nan::ThrowTypeError("Audio file not found");
     return;
   }
 
   string ext;
-  const size_t pos = audio_file.find_last_of(".");
+  const size_t pos = filename.find_last_of(".");
 
   if (pos != -1) {
-    ext = audio_file.substr(pos + 1);
+    ext = filename.substr(pos + 1);
 
     for (std::string::size_type i = 0; i < ext.length(); ++i)
       ext[i] = std::toupper(ext[i]);
   }
 
-  TagLib::FileRef f(audio_file.c_str());
+  TagLib::FileRef f(audio_file);
   TagLib::Tag *tag = f.tag();
   TagLib::PropertyMap map = f.properties();
 
@@ -373,9 +380,9 @@ NAN_METHOD(readTagsSync) {
   // file is not the greatest way to get the pictures for flac files. It seems
   // like this should be managed by the tag->pictures() method on FileRef, but
   // isn't, open to changes here.
-  if (audio_file.find(".flac") != std::string::npos) {
+  if (filename.find(".flac") != std::string::npos) {
 
-    TagLib::FLAC::File flacfile(audio_file.c_str());
+    TagLib::FLAC::File flacfile(audio_file);
     TagLib::List<TagLib::FLAC::Picture *> list = flacfile.pictureList();
 
     size_t arraySize = list.size();
@@ -469,7 +476,7 @@ NAN_METHOD(readTagsSync) {
     // since codec isn't always a member of audioProperties. There should be
     // a better way of getting properties that are unique to each format.
     if (ext == "M4A" || ext == "MP4") {
-      TagLib::MP4::File mp4file(audio_file.c_str());
+      TagLib::MP4::File mp4file(audio_file);
       if (mp4file.audioProperties()) {
         auto codec = mp4file.audioProperties()->codec();
 
