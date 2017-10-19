@@ -6,7 +6,7 @@ var abi = process.env.npm_config_abi || process.versions.modules
 
 console.log('BUILD for %s@%s (abi=%s)', runtime, target, abi)
 
-var ps = spawn('cmake-js', [
+var ps = spawn(`${__dirname}/node_modules/.bin/cmake-js`, [
   'rebuild',
   '-r', runtime,
   '-v', target,
