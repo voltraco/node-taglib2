@@ -1,4 +1,4 @@
-var spawn = require('win-spawn')
+var spawn = require('cross-spawn')
 
 var runtime = process.env.npm_config_runtime || 'node'
 var target = process.env.npm_config_target || process.versions.node

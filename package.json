@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "cmake-js": "^3.5.0",
-    "nan": "^2.4.0",
-    "win-spawn": "^2.0.0"
+    "cross-spawn": "^5.1.0",
+    "nan": "^2.4.0"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
