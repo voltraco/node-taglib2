@@ -120,47 +120,29 @@ NAN_METHOD(writeTagsSync) {
     return o->Get(Nan::New(name).ToLocalChecked())->Int32Value();
   };
 
-  if (hasOption(options, "albumartist")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "albumartist");
-    map.erase(TagLib::String("ALBUMARTIST"));
-    map.insert(TagLib::String("ALBUMARTIST"), value);
-  }
+	string common_props[8] = {"artist", "title", "album", "comment", "genre", "year", "track", "pictures"};
 
-  if (hasOption(options, "discnumber")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "discnumber");
-    map.erase(TagLib::String("DISCNUMBER"));
-    map.insert(TagLib::String("DISCNUMBER"), value);
-  }
+	Local<Array> property_names = options->GetOwnPropertyNames();
+	for (int i = 0; i < property_names->Length(); ++i) {
+    auto key = property_names->Get(Nan::New(i));
+    std::string key_utf = *v8::String::Utf8Value(key);
 
-  if (hasOption(options, "tracknumber")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "tracknumber");
-    map.erase(TagLib::String("TRACKNUMBER"));
-    map.insert(TagLib::String("TRACKNUMBER"), value);
-  }
+		bool isCommon = false;
 
-  if (hasOption(options, "composer")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "composer");
-    map.erase(TagLib::String("COMPOSER"));
-    map.insert(TagLib::String("COMPOSER"), value);
-  }
+		for (int i = 0; i < 8; i++) {
+			if (key_utf.compare(common_props[i]) == 0)
+		    isCommon = true;
+		}
 
-  if (hasOption(options, "id")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "id");
-    map.erase(TagLib::String("ID"));
-    map.insert(TagLib::String("ID"), value);
-  }
+		if (!isCommon) {
+			hasProps = true;
 
-  if (hasOption(options, "bpm")) {
-    hasProps = true;
-    TagLib::String value = getOptionString(options, "bpm");
-    map.erase(TagLib::String("BPM"));
-    map.insert(TagLib::String("BPM"), value);
-  }
+	    TagLib::String value = getOptionString(options, key_utf);
+
+	    map.erase(TagLib::String(TagLib::String(key_utf).upper()));
+	    map.insert(TagLib::String(TagLib::String(key_utf).upper()), value);
+		}
+	}
 
   if (hasProps) {
     f.setProperties(map);
