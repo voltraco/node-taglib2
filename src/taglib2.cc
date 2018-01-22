@@ -37,6 +37,15 @@ using namespace std;
 using namespace v8;
 using namespace node;
 
+static std::wstring GetWString(v8::Handle<v8::String> str)
+{
+  uint16_t* buf = new uint16_t[str->Length()+1];
+  str->Write(buf);
+  std::wstring value = reinterpret_cast<wchar_t*>(buf);
+  delete [] buf;
+  return value;
+}
+
 Local<Value> TagLibStringToString(TagLib::String s) {
 
   if (s.isEmpty()) return Nan::Null();
@@ -53,13 +62,9 @@ TagLib::String StringToTagLibString(std::string s) {
   return TagLib::String(s, TagLib::String::UTF8);
 }
 
-bool isFile(const char *s) {
-  struct stat st;
-#ifdef _WIN32
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG));
-#else
-  return ::stat(s, &st) == 0 && (st.st_mode & (S_IFREG | S_IFLNK));
-#endif
+bool isFile(const wchar_t *fileName) {
+  std::ifstream infile(fileName);
+  return infile.good();
 }
 
 NAN_METHOD(writeTagsSync) {
@@ -79,7 +84,7 @@ NAN_METHOD(writeTagsSync) {
   if (!info[1]->IsObject()) return;
 
   options = v8::Local<v8::Object>::Cast(info[1]);
-  std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
+  std::wstring audio_file = GetWString(info[0]->ToString());
 
   if (!isFile(audio_file.c_str())) {
     Nan::ThrowTypeError("Audio file not found");
@@ -229,15 +234,15 @@ NAN_METHOD(writeTagsSync) {
 NAN_METHOD(readTagsSync) {
   Nan::HandleScope scope;
 
-  std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
+  std::wstring audio_file = GetWString(info[0]->ToString());
 
   if (!isFile(audio_file.c_str())) {
     Nan::ThrowTypeError("Audio file not found");
     return;
   }
 
-  string ext;
-  const size_t pos = audio_file.find_last_of(".");
+  std::wstring ext;
+  const size_t pos = audio_file.find_last_of(L".");
 
   if (pos != -1) {
     ext = audio_file.substr(pos + 1);
@@ -355,7 +360,7 @@ NAN_METHOD(readTagsSync) {
   // file is not the greatest way to get the pictures for flac files. It seems
   // like this should be managed by the tag->pictures() method on FileRef, but
   // isn't, open to changes here.
-  if (audio_file.find(".flac") != std::string::npos) {
+  if (audio_file.find(L".flac") != std::wstring::npos) {
 
     TagLib::FLAC::File flacfile(audio_file.c_str());
     TagLib::List<TagLib::FLAC::Picture *> list = flacfile.pictureList();
@@ -450,7 +455,7 @@ NAN_METHOD(readTagsSync) {
     // this is the same hackery, a second read, is required to get the codec
     // since codec isn't always a member of audioProperties. There should be
     // a better way of getting properties that are unique to each format.
-    if (ext == "M4A" || ext == "MP4") {
+    if (ext == L"M4A" || ext == L"MP4") {
       TagLib::MP4::File mp4file(audio_file.c_str());
       if (mp4file.audioProperties()) {
         auto codec = mp4file.audioProperties()->codec();
