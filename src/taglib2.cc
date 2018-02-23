@@ -25,6 +25,9 @@
 #include <taglib/fileref.h>
 #include <taglib/tfile.h>
 #include <taglib/flacfile.h>
+#include <taglib/wavfile.h>
+#include <taglib/aifffile.h>
+#include <taglib/asffile.h>
 #include <taglib/mp4tag.h>
 #include <taglib/mp4atom.h>
 #include <taglib/mp4file.h>
@@ -480,6 +483,53 @@ NAN_METHOD(readTagsSync) {
           Nan::New<v8::String>(encoding).ToLocalChecked()
         );
       }
+    }
+
+    if (ext == "WAV" || ext == "WAVE") {
+      TagLib::RIFF::WAV::File wavFile(audio_file.c_str());
+      if (wavFile.audioProperties()) {
+        auto bitsPerSample = wavFile.audioProperties()->bitsPerSample();
+
+        obj->Set(
+          Nan::New("bitsPerSample").ToLocalChecked(),
+          Nan::New<v8::Integer>(bitsPerSample)
+        );
+      }
+    } else if (ext == "AIF" || ext == "AIFF" || ext == "AIFC") {
+      TagLib::RIFF::AIFF::File aiffFile(audio_file.c_str());
+      if (aiffFile.audioProperties()) {
+        auto bitsPerSample = aiffFile.audioProperties()->bitsPerSample();
+
+        obj->Set(
+          Nan::New("bitsPerSample").ToLocalChecked(),
+          Nan::New<v8::Integer>(bitsPerSample)
+        );
+      }
+    } else if (ext == "ASF" || ext ==  "WMA") {
+      TagLib::ASF::File asfFile(audio_file.c_str());
+      if (asfFile.audioProperties()) {
+        auto bitsPerSample = asfFile.audioProperties()->bitsPerSample();
+
+        obj->Set(
+          Nan::New("bitsPerSample").ToLocalChecked(),
+          Nan::New<v8::Integer>(bitsPerSample)
+        );
+      }
+    } else if (ext == "FLAC") {
+      TagLib::FLAC::File flacFile(audio_file.c_str());
+      if (flacFile.audioProperties()) {
+        auto bitsPerSample = flacFile.audioProperties()->bitsPerSample();
+
+        obj->Set(
+          Nan::New("bitsPerSample").ToLocalChecked(),
+          Nan::New<v8::Integer>(bitsPerSample)
+        );
+      }
+    } else {
+      obj->Set(
+        Nan::New("bitsPerSample").ToLocalChecked(),
+        Nan::Null()
+      );
     }
 
     stringstream ss;

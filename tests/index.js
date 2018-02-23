@@ -127,6 +127,8 @@ function onReady () {
 
     assert.equal(tags.bitrate, 192)
     assert.equal(tags.samplerate, 44100)
+    // Lossy formats don't have bits per sample
+    assert.equal(tags.bitsPerSample, null)
     assert.equal(tags.channels, 2)
     assert.equal(tags.length, 90)
     assert.equal(tags.time, '1:30')
@@ -202,6 +204,30 @@ function onReady () {
       fs.readFileSync(imagepath)
     ), 0)
 
+    assert.end()
+  })
+
+  test('sync read bitsPerSample FLAC', assert => {
+    const audiopath = FIXTURES_PATH + '/sample.flac'
+    const tags = taglib2.readTagsSync(audiopath)
+
+    assert.notEqual(tags.bitsPerSample, 24)
+    assert.end()
+  })
+
+  test('sync read bitsPerSample WAV', assert => {
+    const audiopath = FIXTURES_PATH + '/sample.wav'
+    const tags = taglib2.readTagsSync(audiopath)
+
+    assert.equal(tags.bitsPerSample, 16)
+    assert.end()
+  })
+
+  test('sync read bitsPerSample AIFF', assert => {
+    const audiopath = FIXTURES_PATH + '/sample.aifc'
+    const tags = taglib2.readTagsSync(audiopath)
+
+    assert.equal(tags.bitsPerSample, 16)
     assert.end()
   })
 }
