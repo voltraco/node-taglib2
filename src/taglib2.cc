@@ -79,7 +79,14 @@ NAN_METHOD(writeTagsSync) {
   if (!info[1]->IsObject()) return;
 
   options = v8::Local<v8::Object>::Cast(info[1]);
-  std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
+
+  Nan::MaybeLocal<v8::String> audio_file_maybe = Nan::To<v8::String>(info[0]);
+  if(audio_file_maybe.IsEmpty()) {
+    Nan::ThrowTypeError("Audio file not found");
+    return;
+  }
+
+  std::string audio_file = *v8::String::Utf8Value(v8::Isolate::GetCurrent(), audio_file_maybe.ToLocalChecked());
 
   if (!isFile(audio_file.c_str())) {
     Nan::ThrowTypeError("Audio file not found");
@@ -100,8 +107,13 @@ NAN_METHOD(writeTagsSync) {
   auto hasOption = [&](
     Local<v8::Object> o,
     const std::string name) -> bool {
+    v8::Maybe<bool> maybe_result = o->Has(Nan::GetCurrentContext(), Nan::New(name).ToLocalChecked());
 
-    return o->Has(Nan::New(name).ToLocalChecked());
+    if(maybe_result.IsNothing()) {
+      return false;
+    } else {
+      return maybe_result.ToChecked();
+    }
   };
 
   auto getOptionString = [&](
@@ -109,15 +121,22 @@ NAN_METHOD(writeTagsSync) {
       const std::string name) -> TagLib::String {
 
     auto r = o->Get(Nan::New(name).ToLocalChecked());
-    std::string s = *v8::String::Utf8Value(r);
-    return StringToTagLibString(s);
+
+    Nan::MaybeLocal<v8::String> s = Nan::To<v8::String>(r);
+
+    std::string st = *v8::String::Utf8Value(v8::Isolate::GetCurrent(), s.ToLocalChecked());
+    return StringToTagLibString(st);
   };
 
   auto getOptionInt = [&](
       Local<v8::Object> o,
       const std::string name) -> int {
 
-    return o->Get(Nan::New(name).ToLocalChecked())->Int32Value();
+    v8::Local<v8::Value> v = o->Get(Nan::New(name).ToLocalChecked());
+
+    Nan::Maybe<int> maybe = Nan::To<int32_t>(v);
+
+    return maybe.ToChecked();
   };
 
   if (hasOption(options, "albumartist")) {
@@ -216,12 +235,12 @@ NAN_METHOD(writeTagsSync) {
       }
 
       auto mimetype = getOptionString(imgObj, "mimetype");
-      auto picture = imgObj->Get(Nan::New("picture").ToLocalChecked());
+      auto picture = Nan::To<v8::Object>(imgObj->Get(Nan::New("picture").ToLocalChecked()));
 
-      if (!picture.IsEmpty() && node::Buffer::HasInstance(picture->ToObject())) {
+      if (!picture.IsEmpty() && node::Buffer::HasInstance(picture.ToLocalChecked())) {
 
-        char* buffer = node::Buffer::Data(picture->ToObject());
-        const size_t blen = node::Buffer::Length(picture->ToObject());
+        char* buffer = node::Buffer::Data(picture.ToLocalChecked());
+        const size_t blen = node::Buffer::Length(picture.ToLocalChecked());
         TagLib::ByteVector data(buffer, blen);
 
         TagLib::Picture pic(data,
@@ -247,7 +266,13 @@ NAN_METHOD(writeTagsSync) {
 NAN_METHOD(readTagsSync) {
   Nan::HandleScope scope;
 
-  std::string audio_file = *v8::String::Utf8Value(info[0]->ToString());
+  Nan::MaybeLocal<v8::String> audio_file_maybe = Nan::To<v8::String>(info[0]);
+  if(audio_file_maybe.IsEmpty()) {
+    Nan::ThrowTypeError("Audio file not found");
+    return;
+  }
+
+  std::string audio_file = *v8::String::Utf8Value(v8::Isolate::GetCurrent(), audio_file_maybe.ToLocalChecked());
 
   if (!isFile(audio_file.c_str())) {
     Nan::ThrowTypeError("Audio file not found");
@@ -504,10 +529,10 @@ NAN_METHOD(readTagsSync) {
 
 void Init(v8::Local<v8::Object> exports, v8::Local<v8::Value> module, void *) {
   exports->Set(Nan::New("writeTagsSync").ToLocalChecked(),
-    Nan::New<v8::FunctionTemplate>(writeTagsSync)->GetFunction());
+    Nan::New<v8::FunctionTemplate>(writeTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
 
   exports->Set(Nan::New("readTagsSync").ToLocalChecked(),
-    Nan::New<v8::FunctionTemplate>(readTagsSync)->GetFunction());
+    Nan::New<v8::FunctionTemplate>(readTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
 }
 
 NODE_MODULE(taglib2, Init)
