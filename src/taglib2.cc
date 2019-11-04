@@ -120,11 +120,9 @@ NAN_METHOD(writeTagsSync) {
       Local<v8::Object> o,
       const std::string name) -> TagLib::String {
 
-    auto r = o->Get(Nan::New(name).ToLocalChecked());
+    auto r = o->Get(Nan::GetCurrentContext(), Nan::New(name).ToLocalChecked());
 
-    Nan::MaybeLocal<v8::String> s = Nan::To<v8::String>(r);
-
-    std::string st = *v8::String::Utf8Value(v8::Isolate::GetCurrent(), s.ToLocalChecked());
+    std::string st = *v8::String::Utf8Value(v8::Isolate::GetCurrent(), r.ToLocalChecked());
     return StringToTagLibString(st);
   };
 
@@ -132,9 +130,9 @@ NAN_METHOD(writeTagsSync) {
       Local<v8::Object> o,
       const std::string name) -> int {
 
-    v8::Local<v8::Value> v = o->Get(Nan::New(name).ToLocalChecked());
+    auto v = o->Get(Nan::GetCurrentContext(), Nan::New(name).ToLocalChecked());
 
-    Nan::Maybe<int> maybe = Nan::To<int32_t>(v);
+    Nan::Maybe<int> maybe = Nan::To<int32_t>(v.ToLocalChecked());
 
     return maybe.ToChecked();
   };
@@ -214,15 +212,15 @@ NAN_METHOD(writeTagsSync) {
   }
 
   if (hasOption(options, "pictures")) {
-    auto pictures = options->Get(Nan::New("pictures").ToLocalChecked());
-    Local<Array> pics = Local<Array>::Cast(pictures);
+    auto pictures = options->Get(Nan::GetCurrentContext(), Nan::New("pictures").ToLocalChecked());
+    Local<Array> pics = Local<Array>::Cast(pictures.ToLocalChecked());
     unsigned int plen = pics->Length();
 
     TagLib::PictureMap picMap;
     bool hasPics = false;
 
     for (unsigned int i = 0; i < plen; i++) {
-      Local<v8::Object> imgObj = Handle<Object>::Cast(pics->Get(i));
+      Local<v8::Object> imgObj = Handle<Object>::Cast(pics->Get(Nan::GetCurrentContext(), i).ToLocalChecked());
 
       if (!hasOption(imgObj, "mimetype")) {
         Nan::ThrowTypeError("mimetype required for each picture");
@@ -235,7 +233,9 @@ NAN_METHOD(writeTagsSync) {
       }
 
       auto mimetype = getOptionString(imgObj, "mimetype");
-      auto picture = Nan::To<v8::Object>(imgObj->Get(Nan::New("picture").ToLocalChecked()));
+      auto picture = Nan::To<v8::Object>(
+        imgObj->Get(Nan::GetCurrentContext(), Nan::New("picture").ToLocalChecked()).ToLocalChecked()
+      );
 
       if (!picture.IsEmpty() && node::Buffer::HasInstance(picture.ToLocalChecked())) {
 
@@ -300,46 +300,57 @@ NAN_METHOD(readTagsSync) {
 
   v8::Local<v8::Object> obj = Nan::New<v8::Object>();
 
-  !tag->title().isEmpty() && obj->Set(
-    Nan::New("title").ToLocalChecked(),
-    TagLibStringToString(tag->title())
-  );
+  if(!tag->title().isEmpty()) {
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("title").ToLocalChecked(),
+      TagLibStringToString(tag->title())
+    );
+  }
 
-  !tag->artist().isEmpty() && obj->Set(
-    Nan::New("artist").ToLocalChecked(),
-    TagLibStringToString(tag->artist())
-  );
+  if(!tag->artist().isEmpty()) {
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("artist").ToLocalChecked(),
+      TagLibStringToString(tag->artist())
+    );
+  }
 
   if (map.contains("COMPILATION")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("compilation").ToLocalChecked(),
       TagLibStringToString(map["COMPILATION"].toString(","))
     );
   }
 
   if (map.contains("ID")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("id").ToLocalChecked(),
       TagLibStringToString(map["ID"].toString(","))
     );
   }
 
   if (map.contains("ALBUMARTIST")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("albumartist").ToLocalChecked(),
       TagLibStringToString(map["ALBUMARTIST"].toString(","))
     );
   }
 
   if (map.contains("DISCNUMBER")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("discnumber").ToLocalChecked(),
       TagLibStringToString(map["DISCNUMBER"].toString(","))
     );
   }
 
   if (map.contains("TRACKNUMBER")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("tracknumber").ToLocalChecked(),
       TagLibStringToString(map["TRACKNUMBER"].toString(","))
     );
@@ -356,40 +367,53 @@ NAN_METHOD(readTagsSync) {
       i = atoi(s);
     }
 
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("bpm").ToLocalChecked(),
       Nan::New<v8::Integer>(i)
     );
   }
 
   if (map.contains("COMPOSER")) {
-    obj->Set(
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("composer").ToLocalChecked(),
       TagLibStringToString(map["COMPOSER"].toString(","))
     );
   }
 
-  !tag->album().isEmpty() && obj->Set(
-    Nan::New("album").ToLocalChecked(),
-    TagLibStringToString(tag->album())
-  );
+  if(!tag->album().isEmpty()) {
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("album").ToLocalChecked(),
+      TagLibStringToString(tag->album())
+    );
+  }
 
-  !tag->comment().isEmpty() && obj->Set(
-    Nan::New("comment").ToLocalChecked(),
-    TagLibStringToString(tag->comment())
-  );
+  if(!tag->comment().isEmpty()) {
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("comment").ToLocalChecked(),
+      TagLibStringToString(tag->comment())
+    );
+  }
 
-  !tag->genre().isEmpty() && obj->Set(
-    Nan::New("genre").ToLocalChecked(),
-    TagLibStringToString(tag->genre())
-  );
+  if(!tag->genre().isEmpty()) {
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("genre").ToLocalChecked(),
+      TagLibStringToString(tag->genre())
+    );
+  }
 
-  obj->Set( // is always at least 0
+  auto test = obj->Set( // is always at least 0
+    Nan::GetCurrentContext(),
     Nan::New("track").ToLocalChecked(),
     Nan::New<v8::Integer>(tag->track())
   );
 
-  obj->Set( // is always at least 0
+  test = obj->Set( // is always at least 0
+    Nan::GetCurrentContext(),
     Nan::New("year").ToLocalChecked(),
     Nan::New<v8::Integer>(tag->year())
   );
@@ -419,20 +443,30 @@ NAN_METHOD(readTagsSync) {
       v8::Local<v8::Object> buf = Nan::NewBuffer(datasize).ToLocalChecked();
       memcpy(node::Buffer::Data(buf), rawdata, datasize);
 
-      imgObj->Set(
+      test = imgObj->Set(
+        Nan::GetCurrentContext(),
         Nan::New("mimetype").ToLocalChecked(),
         TagLibStringToString(p->mimeType())
       );
 
-      imgObj->Set(
+      test = imgObj->Set(
+        Nan::GetCurrentContext(),
         Nan::New("picture").ToLocalChecked(),
         buf
       );
 
-      pictures->Set(picIndex++, imgObj);
+      test = pictures->Set(
+        Nan::GetCurrentContext(),
+        picIndex++,
+        imgObj
+      );
     }
 
-    obj->Set(Nan::New("pictures").ToLocalChecked(), pictures);
+    test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("pictures").ToLocalChecked(),
+      pictures
+    );
   }
   else if (!tag->pictures().isEmpty()) {
 
@@ -451,20 +485,30 @@ NAN_METHOD(readTagsSync) {
       v8::Local<v8::Object> buf = Nan::NewBuffer(datasize).ToLocalChecked();
       memcpy(node::Buffer::Data(buf), rawdata, datasize);
 
-      imgObj->Set(
+      auto test = imgObj->Set(
+        Nan::GetCurrentContext(),
         Nan::New("mimetype").ToLocalChecked(),
         TagLibStringToString(p.second[0].mime())
       );
 
-      imgObj->Set(
+      test = imgObj->Set(
+        Nan::GetCurrentContext(),
         Nan::New("picture").ToLocalChecked(),
         buf
       );
 
-      pictures->Set(picIndex++, imgObj);
+      test = pictures->Set(
+        Nan::GetCurrentContext(),
+        picIndex++,
+        imgObj
+      );
     }
 
-    obj->Set(Nan::New("pictures").ToLocalChecked(), pictures);
+    auto test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("pictures").ToLocalChecked(),
+      pictures
+    );
   }
 
   if (f.audioProperties()) {
@@ -475,17 +519,20 @@ NAN_METHOD(readTagsSync) {
     int minutes = (properties->length() - seconds) / 60;
     int hours = (properties->length() - minutes * 60) / 60;
 
-    obj->Set(
+    test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("bitrate").ToLocalChecked(),
       Nan::New<v8::Integer>(properties->bitrate())
     );
 
-    obj->Set(
+    test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("samplerate").ToLocalChecked(),
       Nan::New<v8::Integer>(properties->sampleRate())
     );
 
-    obj->Set(
+    test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("channels").ToLocalChecked(),
       Nan::New<v8::Integer>(properties->channels())
     );
@@ -500,7 +547,8 @@ NAN_METHOD(readTagsSync) {
 
         string encoding = codec == 2 ? "alac" : "aac";
 
-        obj->Set(
+        test = obj->Set(
+          Nan::GetCurrentContext(),
           Nan::New("codec").ToLocalChecked(),
           Nan::New<v8::String>(encoding).ToLocalChecked()
         );
@@ -516,9 +564,14 @@ NAN_METHOD(readTagsSync) {
 
     auto time = Nan::New<v8::String>(s.c_str(), s.size()).ToLocalChecked();
 
-    obj->Set(Nan::New("time").ToLocalChecked(), time);
+    test = obj->Set(
+      Nan::GetCurrentContext(),
+      Nan::New("time").ToLocalChecked(),
+      time
+    );
 
-    obj->Set(
+    test = obj->Set(
+      Nan::GetCurrentContext(),
       Nan::New("length").ToLocalChecked(),
       Nan::New<v8::Integer>(properties->length())
     );
@@ -528,11 +581,17 @@ NAN_METHOD(readTagsSync) {
 }
 
 void Init(v8::Local<v8::Object> exports, v8::Local<v8::Value> module, void *) {
-  exports->Set(Nan::New("writeTagsSync").ToLocalChecked(),
-    Nan::New<v8::FunctionTemplate>(writeTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
+  auto test = exports->Set(
+    Nan::GetCurrentContext(),
+    Nan::New("writeTagsSync").ToLocalChecked(),
+    Nan::New<v8::FunctionTemplate>(writeTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked()
+  );
 
-  exports->Set(Nan::New("readTagsSync").ToLocalChecked(),
-    Nan::New<v8::FunctionTemplate>(readTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked());
+  test = exports->Set(
+    Nan::GetCurrentContext(),
+    Nan::New("readTagsSync").ToLocalChecked(),
+    Nan::New<v8::FunctionTemplate>(readTagsSync)->GetFunction(Nan::GetCurrentContext()).ToLocalChecked()
+  );
 }
 
 NODE_MODULE(taglib2, Init)
