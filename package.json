@@ -14,7 +14,7 @@
   "dependencies": {
     "cmake-js": "^3.5.0",
     "cross-spawn": "^5.1.0",
-    "nan": "^2.4.0",
+    "nan": "^2.14.0",
     "npm-run-path": "^2.0.2"
   },
   "devDependencies": {
